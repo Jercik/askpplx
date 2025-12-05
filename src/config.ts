@@ -51,11 +51,11 @@ export function getConfigPath(): string {
 }
 
 /**
- * Mask API key for display: shows first 4 and last 4 characters.
+ * Mask API key for display: shows first 4 and last 4 characters for keys > 16 chars.
  * Returns undefined if key is undefined or empty.
  */
 export function maskApiKey(key?: string): string | undefined {
   if (!key) return undefined;
-  if (key.length <= 12) return "****";
+  if (key.length <= 16) return "****";
   return `${key.slice(0, 4)}...${key.slice(-4)}`;
 }
