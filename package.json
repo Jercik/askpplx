@@ -44,6 +44,7 @@
     "@ai-sdk/perplexity": "^2.0.21",
     "ai": "^5.0.106",
     "commander": "^14.0.2",
+    "conf": "^15.0.2",
     "zod": "^4.1.13"
   },
   "devDependencies": {

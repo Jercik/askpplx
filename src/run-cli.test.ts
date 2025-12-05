@@ -4,6 +4,11 @@ import type { AskPerplexityResult } from "./ask-perplexity.js";
 import type { CliDependencies } from "./run-cli.js";
 import { formatResult, runCli } from "./run-cli.js";
 
+// Mock config module to avoid side effects (Conf instantiation)
+vi.mock("./config.js", () => ({
+  getPerplexityApiKey: vi.fn(),
+}));
+
 const DEFAULT_SYSTEM_PROMPT = "You are a helpful assistant.";
 
 function createMockResult(
@@ -245,8 +250,9 @@ describe("runCli", () => {
       await runCli("test prompt", { model: "sonar" }, deps);
 
       expect(deps.errorOutput).toHaveBeenCalledWith(
-        "Error: PERPLEXITY_API_KEY environment variable is required\n" +
-          "Set it with: export PERPLEXITY_API_KEY='your-api-key'",
+        "Error: Perplexity API key is required\n" +
+          "Set it with: export PERPLEXITY_API_KEY='your-api-key'\n" +
+          "Or store it: askpplx config --set-api-key 'your-api-key'",
       );
       expect(deps.exit).toHaveBeenCalledWith(1);
     });
