@@ -51,7 +51,8 @@ export function getConfigPath(): string {
 }
 
 /**
- * Mask API key for display: shows first 4 and last 4 characters for keys > 16 chars.
+ * Mask API key for display: shows first 4 and last 4 characters for keys longer than 16 chars.
+ * For keys of length 16 or less, returns "****".
  * Returns undefined if key is undefined or empty.
  */
 export function maskApiKey(key?: string): string | undefined {
