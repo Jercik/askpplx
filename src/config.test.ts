@@ -106,9 +106,9 @@ describe("config", () => {
       expect(maskApiKey("")).toBeUndefined();
     });
 
-    it("returns **** for short keys (12 chars or less)", () => {
+    it("returns **** for short keys (16 chars or less)", () => {
       expect(maskApiKey("short")).toBe("****");
-      expect(maskApiKey("123456789012")).toBe("****");
+      expect(maskApiKey("1234567890123456")).toBe("****"); // exactly 16 chars
     });
 
     it("masks long keys showing first 4 and last 4", () => {
