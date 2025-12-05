@@ -3,6 +3,13 @@
 import { Command } from "commander";
 
 import packageJson from "../package.json" with { type: "json" };
+import {
+  clearPerplexityApiKey,
+  getConfigPath,
+  getPerplexityApiKey,
+  maskApiKey,
+  setPerplexityApiKey,
+} from "./config.js";
 import type { CliOptions } from "./run-cli.js";
 import { runCli } from "./run-cli.js";
 
@@ -60,5 +67,47 @@ const program = new Command()
       process.exitCode = 1;
     }
   });
+
+program
+  .command("config")
+  .description("Manage stored configuration")
+  .option("--set-api-key <key>", "Store Perplexity API key")
+  .option("--show-api-key", "Show stored API key (masked)")
+  .option("--clear-api-key", "Remove stored API key")
+  .option("--path", "Show config file path")
+  .action(
+    (options: {
+      setApiKey?: string;
+      showApiKey?: boolean;
+      clearApiKey?: boolean;
+      path?: boolean;
+    }) => {
+      try {
+        if (options.setApiKey) {
+          setPerplexityApiKey(options.setApiKey);
+          console.log("API key stored successfully.");
+        } else if (options.showApiKey) {
+          const key = getPerplexityApiKey();
+          const masked = maskApiKey(key);
+          console.log(masked ? `API key: ${masked}` : "No API key configured.");
+        } else if (options.clearApiKey) {
+          clearPerplexityApiKey();
+          console.log("API key cleared.");
+        } else if (options.path) {
+          console.log(getConfigPath());
+        } else {
+          const configCmd = program.commands.find((c) => c.name() === "config");
+          configCmd?.help();
+        }
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred";
+        console.error(`Error: ${message}`);
+        process.exitCode = 1;
+      }
+    },
+  );
 
 program.parse();

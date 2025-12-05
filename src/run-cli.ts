@@ -3,6 +3,7 @@ import type {
   SearchContextSize,
 } from "./ask-perplexity.js";
 import { streamPerplexity } from "./ask-perplexity.js";
+import { getPerplexityApiKey } from "./config.js";
 import { loadSystemPrompt } from "./load-system-prompt.js";
 import {
   collectStreamToResult,
@@ -34,7 +35,7 @@ export type CliDependencies = {
 const defaultDependencies: CliDependencies = {
   streamPerplexity,
   loadSystemPrompt,
-  getApiKey: () => process.env["PERPLEXITY_API_KEY"],
+  getApiKey: getPerplexityApiKey,
   output: (message) => {
     console.log(message);
   },
@@ -86,8 +87,9 @@ export async function runCli(
 
   if (!apiKey) {
     deps.errorOutput(
-      "Error: PERPLEXITY_API_KEY environment variable is required\n" +
-        "Set it with: export PERPLEXITY_API_KEY='your-api-key'",
+      "Error: Perplexity API key is required\n" +
+        "Set it with: export PERPLEXITY_API_KEY='your-api-key'\n" +
+        "Or store it: askpplx config --set-api-key 'your-api-key'",
     );
     deps.exit(1);
   }
