@@ -82,21 +82,30 @@ program
       clearApiKey?: boolean;
       path?: boolean;
     }) => {
-      if (options.setApiKey) {
-        setPerplexityApiKey(options.setApiKey);
-        console.log("API key stored successfully.");
-      } else if (options.showApiKey) {
-        const key = getPerplexityApiKey();
-        const masked = maskApiKey(key);
-        console.log(masked ? `API key: ${masked}` : "No API key configured.");
-      } else if (options.clearApiKey) {
-        clearPerplexityApiKey();
-        console.log("API key cleared.");
-      } else if (options.path) {
-        console.log(getConfigPath());
-      } else {
-        const configCmd = program.commands.find((c) => c.name() === "config");
-        configCmd?.help();
+      try {
+        if (options.setApiKey) {
+          setPerplexityApiKey(options.setApiKey);
+          console.log("API key stored successfully.");
+        } else if (options.showApiKey) {
+          const key = getPerplexityApiKey();
+          const masked = maskApiKey(key);
+          console.log(masked ? `API key: ${masked}` : "No API key configured.");
+        } else if (options.clearApiKey) {
+          clearPerplexityApiKey();
+          console.log("API key cleared.");
+        } else if (options.path) {
+          console.log(getConfigPath());
+        } else {
+          const configCmd = program.commands.find((c) => c.name() === "config");
+          configCmd?.help();
+        }
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred";
+        console.error(`Error: ${message}`);
+        process.exitCode = 1;
       }
     },
   );
