@@ -25,7 +25,10 @@ function getConfig(): Conf<ConfigSchema> {
   return configInstance;
 }
 
-/** Get API key: env var takes precedence over stored config. */
+/**
+ * Get API key: env var takes precedence over stored config.
+ * Note: An empty PERPLEXITY_API_KEY="" explicitly disables stored config.
+ */
 export function getPerplexityApiKey(): string | undefined {
   return (
     process.env["PERPLEXITY_API_KEY"] ?? getConfig().get("perplexityApiKey")
