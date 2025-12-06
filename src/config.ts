@@ -19,6 +19,7 @@ function getConfig(): Conf<ConfigSchema> {
     configInstance = new Conf<ConfigSchema>({
       projectName: packageJson.name,
       projectVersion: packageJson.version,
+      projectSuffix: "",
       schema,
     });
   }
