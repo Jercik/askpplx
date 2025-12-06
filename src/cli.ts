@@ -14,6 +14,11 @@ import type { CliOptions } from "./run-cli.js";
 import { runCli } from "./run-cli.js";
 
 const usageExamples = `
+About Perplexity:
+  Perplexity AI is an AI-powered search engine and answer engine that delivers
+  concise, accurate responses to user queries by combining real-time web
+  searches with advanced language models.
+
 Models:
   sonar               Fast, lightweight for quick searches (128K context)
   sonar-pro           Advanced multi-step research queries

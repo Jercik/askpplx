@@ -1,12 +1,12 @@
 {
-  "name": "ask-pplx-cli",
+  "name": "askpplx",
   "author": "Łukasz Jerciński",
   "license": "MIT",
   "version": "1.0.0",
   "description": "Minimal Unix-style CLI for querying Perplexity Sonar API.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Jercik/ask-pplx-cli.git"
+    "url": "git+https://github.com/Jercik/askpplx.git"
   },
   "type": "module",
   "bin": {
