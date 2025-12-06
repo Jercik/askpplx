@@ -1,11 +1,17 @@
 name: PR Review with Claude Code
 
 on:
-  pull_request:
-    types: [opened, synchronize, ready_for_review, reopened]
+  workflow_run:
+    workflows: ["Checks"]
+    types: [completed]
 
 jobs:
   review-with-claude-code:
+    # Only run if Checks succeeded AND it was triggered by a pull request
+    # (Checks also runs on push to main, where there's no PR to review)
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -16,7 +22,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
+          ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
 
       - name: PR Review with Claude Code
         uses: anthropics/claude-code-action@6610520549f7c056fddb45c344d353796da65b11
@@ -29,7 +42,7 @@ jobs:
           # Your custom review instructions
           prompt: |
             REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
+            PR NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
 
             Act as a Principal Software Engineer. Conduct a high-leverage code review focusing on architectural integrity, logic errors, and security.
 
