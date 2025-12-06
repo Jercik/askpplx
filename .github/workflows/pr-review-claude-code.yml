@@ -18,6 +18,12 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+
       - name: PR Review with Claude Code
         uses: anthropics/claude-code-action@6610520549f7c056fddb45c344d353796da65b11
         with:
