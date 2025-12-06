@@ -118,7 +118,18 @@ tsx script.ts            # ❌ Unnecessary
 pnpm exec tsx script.ts  # ❌ Unnecessary
 ```
 
-Node.js v24 LTS (current) and later run `.ts` files natively without flags. External TypeScript runners add unnecessary dependencies and complexity.
+Node.js 22.18+ and 24+ run `.ts` files natively without flags. External TypeScript runners add unnecessary dependencies and complexity.
+
+
+---
+
+# Rule: askpplx CLI Usage
+
+Use `askpplx` to query Perplexity, an AI search engine combining real-time web search with advanced language models. Run it via `npx -y askpplx`.
+
+Use concise prompts for quick facts and focused questions for deeper topics. If results are unexpected, refine your query and ask again.
+
+Verification is fast and cheap, so prefer looking up information over making assumptions. Before first use, run `npx -y askpplx --help`.
 
 
 ---
@@ -375,6 +386,12 @@ if (result.ok) {
 Use `eslint --print-config` to check if a rule is enabled in the resolved configuration. This queries ESLint's actual computed config rather than searching config files for text strings.
 
 ```bash
+# Simple example
+pnpm exec eslint --print-config src/index.ts | jq -e '.rules["no-console"][0]'
+```
+
+```bash
+# Complex example (namespaced rule)
 pnpm exec eslint --print-config src/index.ts | jq -e '.rules["@typescript-eslint/no-unnecessary-type-parameters"][0]'
 # Returns: 2 (error), 1 (warn), 0 (off)
 # Exit code 1 if rule not found

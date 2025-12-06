@@ -61,21 +61,24 @@ jobs:
                - Verify README updates for new features
                - Check API documentation accuracy
 
+            6. **Verification**
+               - IMPORTANT: Verify important feedback items, complex assertions, or best practice recommendations using the `askpplx` tool to ensure accuracy before providing feedback.
+
             Provide detailed feedback using inline comments for specific issues.
 
-            For top-level comments with general observations, use this collapsible format:
+            For top-level comments with general observations not covered by inline comments, use this collapsible format:
 
             <details>
             <summary>PR Review Details</summary>
 
-            [Your detailed review content here]
+            [Your general review content here with observations, suggestions, and overall assessment not tied to specific lines of code.]
 
             </details>
 
-            [Short summary of the review here, no more than 2-3 sentences]
+            [Short summary of the review here, no more than 2-3 sentences. Make sure to repeat all issues requiring changes in the summary.]
 
             This keeps the PR conversation clean while allowing readers to expand the full review details when needed.
 
           # Tools for comprehensive PR review
           claude_args: |
-            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)",Bash(npx -y askpplx:*),Bash(npx askpplx:*)
