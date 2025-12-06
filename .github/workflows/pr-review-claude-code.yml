@@ -79,6 +79,7 @@ jobs:
 
             This keeps the PR conversation clean while allowing readers to expand the full review details when needed.
 
+          model: claude-opus-4-5
+
           # Tools for comprehensive PR review
-          claude_args: |
-            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(npx -y askpplx:*),Bash(npx askpplx:*)"
+          allowed_tools: "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(npx -y askpplx:*),Bash(npx askpplx:*)"
