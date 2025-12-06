@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 1
 
       - name: PR Review with Claude Code
-        uses: anthropics/claude-code-action@main
+        uses: anthropics/claude-code-action@6610520549f7c056fddb45c344d353796da65b11
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
@@ -34,9 +34,9 @@ jobs:
             Act as a Principal Software Engineer. Conduct a high-leverage code review focusing on architectural integrity, logic errors, and security.
 
             **Guidelines:**
-            1. **Skip Linting:** Do NOT comment on formatting, naming conventions, or style issues (these are handled by CI).
-            2. **Verify Facts:** You MUST use `askpplx` to confirm library behaviors, deprecations, or API signatures before claiming them as fact.
-            3. **Be Specific:** Explain *why* code is problematic and suggest concrete alternatives.
+            - **Skip Linting:** Do NOT comment on formatting, naming conventions, or style issues (these are handled by CI).
+            - **Verify Facts:** You MUST use `askpplx` to confirm library behaviors, deprecations, or API signatures before claiming them as fact.
+            - **Be Specific:** Explain *why* code is problematic and suggest concrete alternatives.
 
             **Focus Areas:**
             1. **Correctness & Robustness:**
