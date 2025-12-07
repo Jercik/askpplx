@@ -36,11 +36,20 @@ askpplx "What are breaking changes in React 19 that affect this code? $(cat src/
 Add this rule to your `CLAUDE.md` or `AGENTS.md` to enable automatic Perplexity lookups, no need to configure MCPs:
 
 ```markdown
-# Rule: askpplx CLI Usage
+# Rule: `askpplx` CLI Usage
 
-Use `askpplx` to query Perplexity, an AI search engine combining real-time web search with advanced language models. Run it via `npx -y askpplx`.
+**MANDATORY:** Run `npx -y askpplx --help` at the start of every agent session to learn available options and confirm the tool is working.
 
-Use concise prompts for quick facts and focused questions for deeper topics. If results are unexpected, refine your query and ask again.
+Use `askpplx` to query Perplexity, an AI search engine combining real-time web search with advanced language models.
 
-Verification is fast and cheap, so prefer looking up information over making assumptions. Before first use, run `npx -y askpplx --help`.
+## Why This Matters
+
+- **Ground your knowledge:** Your training data has a cutoff date. Real-time search ensures you work with current information—correct API signatures, latest versions, up-to-date best practices.
+- **Save time and resources:** A quick lookup is far cheaper than debugging hallucinated code or explaining why an approach failed. When in doubt, verify first.
+- **Reduce false confidence:** Even when you feel certain, external verification catches subtle errors before they compound into larger problems.
+- **Stay current:** Libraries change, APIs deprecate, patterns evolve. What was correct six months ago may be wrong today.
+
+## Usage Guidelines
+
+Use concise prompts for quick facts and focused questions for deeper topics. If results are unexpected, refine your query and ask again. Verification is fast and cheap—prefer looking up information over making assumptions.
 ```
