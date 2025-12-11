@@ -149,7 +149,11 @@ jobs:
                   "run_shell_command(pnpm typecheck)",
                   "run_shell_command(pnpm test)",
                   "run_shell_command(npx -y askpplx)",
-                  "run_shell_command(npx askpplx)"
+                  "run_shell_command(npx askpplx)",
+                  "run_shell_command(wc)",
+                  "run_shell_command(sort)",
+                  "run_shell_command(uniq)",
+                  "run_shell_command(cut)"
                 ]
               }
             }
