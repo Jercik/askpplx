@@ -29,6 +29,15 @@ askpplx "Explain Raft vs Paxos in simple terms"
 
 # web-enabled search with local context
 askpplx "What are breaking changes in React 19 that affect this code? $(cat src/app.tsx)"
+
+# read prompt from stdin (filter style)
+cat article.txt | askpplx -S "Summarize this article"
+
+# extract plain text from JSON response
+askpplx "Node.js LTS version" --json | jq -r '.text'
+
+# list cited source URLs
+askpplx "Latest TypeScript release notes" --json | jq -r '.sources[].url' | sort -u
 ```
 
 ## Agent Rule
