@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Command } from "commander";
+import { Command, Option } from "@commander-js/extra-typings";
 
 import packageJson from "../package.json" with { type: "json" };
 import {
@@ -12,6 +12,7 @@ import {
 } from "./config.js";
 import type { CliOptions } from "./run-cli.js";
 import { runCli } from "./run-cli.js";
+import type { SearchContextSize } from "./ask-perplexity.js";
 
 const usageExamples = `
 About Perplexity:
@@ -38,33 +39,64 @@ Examples:
   askpplx "Latest news on AI" -c medium
   askpplx "$(cat article.txt)" -s ./summarize.md
   askpplx "$(cat article.txt)" -S "Summarize this article"
+  cat article.txt | askpplx -S "Summarize this article"
   askpplx "Node.js LTS version" --json | jq -r '.text'
   askpplx "Show reasoning" --show-thinking`;
 
+async function readStdinText(): Promise<string> {
+  process.stdin.setEncoding("utf8");
+  const chunks: string[] = [];
+  for await (const chunk of process.stdin as AsyncIterable<string>) {
+    chunks.push(chunk);
+  }
+  return chunks.join("");
+}
+
 const program = new Command()
-  .name("askpplx")
+  .name(packageJson.name)
   .description(packageJson.description)
   .version(packageJson.version)
+  .showHelpAfterError("(add --help for additional information)")
+  .showSuggestionAfterError()
   .argument("[prompt]", "The prompt to send to Perplexity Sonar")
   .option("-m, --model <model>", "Model to use", "sonar-reasoning-pro")
   .option("-s, --system <path>", "Path to custom system prompt file")
   .option("-S, --system-text <text>", "System prompt text (overrides -s)")
-  .option(
-    "-c, --context <size>",
-    "Search context size: low, medium, high",
-    "high",
+  .addOption(
+    new Option("-c, --context <size>", "Search context size: low, medium, high")
+      .choices(["low", "medium", "high"] as const)
+      .default("high"),
   )
   .option("--json", "Output full API response as JSON (text, sources, usage)")
   .option("--show-thinking", "Show model thinking/reasoning blocks")
-  .option("--no-stream, --no-streaming", "Disable streaming output")
+  .option("--no-stream", "Disable streaming output")
+  .addOption(new Option("--no-streaming", "Alias for --no-stream").hideHelp())
   .addHelpText("after", usageExamples)
-  .action(async (prompt: string | undefined, options: CliOptions) => {
-    if (!prompt) {
-      program.help();
-      return;
-    }
+  .action(async (prompt, options) => {
     try {
-      await runCli(prompt, options);
+      const stdinPrompt =
+        !prompt && !process.stdin.isTTY ? await readStdinText() : undefined;
+      const effectivePrompt = (prompt ?? stdinPrompt)?.trimEnd();
+
+      if (!effectivePrompt || effectivePrompt.trim().length === 0) {
+        program.error(
+          "Missing prompt.\nUsage: askpplx <prompt> OR cat <file> | askpplx",
+          { exitCode: 1 },
+        );
+        return;
+      }
+
+      const cliOptions: CliOptions = {
+        model: options.model,
+        json: Boolean(options.json),
+        system: options.system,
+        systemText: options.systemText,
+        context: options.context as SearchContextSize | undefined,
+        showThinking: Boolean(options.showThinking),
+        stream: options.stream && options.streaming,
+      };
+
+      await runCli(effectivePrompt, cliOptions);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "An unexpected error occurred";
@@ -73,7 +105,7 @@ const program = new Command()
     }
   });
 
-program
+const configCommand = program
   .command("config")
   .description("Manage stored configuration")
   .option("--set-api-key <key>", "Store Perplexity API key")
@@ -90,19 +122,18 @@ program
       try {
         if (options.setApiKey) {
           setPerplexityApiKey(options.setApiKey);
-          console.log("API key stored successfully.");
+          console.error("API key stored successfully.");
         } else if (options.showApiKey) {
           const key = getPerplexityApiKey();
           const masked = maskApiKey(key);
           console.log(masked ? `API key: ${masked}` : "No API key configured.");
         } else if (options.clearApiKey) {
           clearPerplexityApiKey();
-          console.log("API key cleared.");
+          console.error("API key cleared.");
         } else if (options.path) {
           console.log(getConfigPath());
         } else {
-          const configCmd = program.commands.find((c) => c.name() === "config");
-          configCmd?.help();
+          configCommand.help({ error: true });
         }
       } catch (error) {
         const message =
@@ -115,4 +146,4 @@ program
     },
   );
 
-program.parse();
+await program.parseAsync();
