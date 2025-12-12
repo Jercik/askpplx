@@ -34,6 +34,11 @@ describe("collectStdinText", () => {
     expect(text).toBe("");
   });
 
+  it("allows input exactly at maxBytes", async () => {
+    const text = await collectStdinText(chunks(["hi"]), 2);
+    expect(text).toBe("hi");
+  });
+
   it("throws when input exceeds maxBytes", async () => {
     await expect(collectStdinText(chunks(["hello"]), 4)).rejects.toThrow(
       "Input too large",
