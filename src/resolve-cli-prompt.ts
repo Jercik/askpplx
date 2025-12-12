@@ -3,7 +3,8 @@ export function resolveCliPrompt(
   stdinText?: string,
 ): string | undefined {
   const candidate = (promptArgument ?? stdinText)?.trimEnd();
-  if (!candidate) return undefined;
-  if (candidate.trim().length === 0) return undefined;
+  if (candidate === undefined) return undefined;
+  const trimmedCandidate = candidate.trim();
+  if (trimmedCandidate.length === 0) return undefined;
   return candidate;
 }

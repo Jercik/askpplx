@@ -12,7 +12,10 @@ export async function collectStdinText(
   for await (const chunk of input) {
     totalBytes += Buffer.byteLength(chunk, "utf8");
     if (totalBytes > maxBytes) {
-      throw new Error("Input too large: exceeds 10MB limit");
+      const limitMegabytes = Math.round(maxBytes / 1024 / 1024);
+      throw new Error(
+        `Input too large: exceeds ${String(limitMegabytes)}MB limit`,
+      );
     }
     chunks.push(chunk);
   }
