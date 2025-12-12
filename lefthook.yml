@@ -1,0 +1,9 @@
+pre-commit:
+  commands:
+    checks:
+      run: bash scripts/pre-commit.sh
+
+commit-msg:
+  commands:
+    lint:
+      run: bash scripts/commitlint.sh {1}
