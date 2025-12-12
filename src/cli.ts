@@ -13,6 +13,8 @@ import {
 import type { CliOptions } from "./run-cli.js";
 import { runCli } from "./run-cli.js";
 import type { SearchContextSize } from "./ask-perplexity.js";
+import { collectStdinText } from "./collect-stdin-text.js";
+import { resolveCliPrompt } from "./resolve-cli-prompt.js";
 
 const usageExamples = `
 About Perplexity:
@@ -43,15 +45,6 @@ Examples:
   askpplx "Node.js LTS version" --json | jq -r '.text'
   askpplx "Show reasoning" --show-thinking`;
 
-async function readStdinText(): Promise<string> {
-  process.stdin.setEncoding("utf8");
-  const chunks: string[] = [];
-  for await (const chunk of process.stdin as AsyncIterable<string>) {
-    chunks.push(chunk);
-  }
-  return chunks.join("");
-}
-
 const program = new Command()
   .name(packageJson.name)
   .description(packageJson.description)
@@ -74,13 +67,20 @@ const program = new Command()
   .addHelpText("after", usageExamples)
   .action(async (prompt, options) => {
     try {
-      const stdinPrompt =
-        !prompt && !process.stdin.isTTY ? await readStdinText() : undefined;
-      const effectivePrompt = (prompt ?? stdinPrompt)?.trimEnd();
+      let stdinText: string | undefined;
+      if (!prompt && !process.stdin.isTTY) {
+        process.stdin.setEncoding("utf8");
+        stdinText = await collectStdinText(
+          process.stdin as AsyncIterable<string>,
+        );
+      }
 
-      if (!effectivePrompt || effectivePrompt.trim().length === 0) {
+      const effectivePrompt = resolveCliPrompt(prompt, stdinText);
+      if (!effectivePrompt) {
         program.error(
-          "Missing prompt.\nUsage: askpplx <prompt> OR cat <file> | askpplx",
+          "Missing prompt.\n" +
+            'Usage: askpplx <prompt> OR cat <file> | askpplx -S "Summarize this article"\n' +
+            "(Note: use -S to provide an instruction with stdin input)",
           { exitCode: 1 },
         );
         return;
