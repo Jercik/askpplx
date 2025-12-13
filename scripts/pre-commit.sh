@@ -11,7 +11,6 @@ if command -v npm >/dev/null 2>&1; then
   npm pkg fix || true
 fi
 
-lint_staged="false"
 lint_staged="$(node -e 'const fs=require("fs"); const pkg=JSON.parse(fs.readFileSync("package.json","utf8")); const deps={...(pkg.dependencies||{}),...(pkg.devDependencies||{})}; const enabled=("lint-staged" in deps) || (pkg["lint-staged"]!=null); process.stdout.write(enabled?"true":"false");' 2>/dev/null || echo false)"
 
 if [[ "$lint_staged" == "true" ]]; then
