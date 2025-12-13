@@ -19,7 +19,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "prepare": "lefthook install || echo 'Install lefthook: https://lefthook.dev/intro.html'",
+    "prepare": "npx -y lefthook install",
     "start": "pnpm -s run rebuild && node --env-file=.env bin/askpplx",
     "build": "tsc -p tsconfig.app.json && cp -r src/prompts dist/",
     "clean": "rm -rf dist *.tsbuildinfo",
