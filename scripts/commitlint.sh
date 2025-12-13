@@ -36,15 +36,19 @@ if [[ "$has_verbose" != "true" ]]; then
 fi
 
 # Run commitlint via npx with @commitlint/config-conventional.
-# We resolve the package path from within the npx context (where the packages
-# are installed) and use the absolute path in the config's extends array.
-# This avoids module resolution issues when the config file is in a temp directory.
+# Extract the npx cache node_modules path from PATH and create a temp config
+# with an absolute path to the config-conventional module.
 npx -y -p @commitlint/cli -p @commitlint/config-conventional sh -c '
   set -e
-  config_path=$(node -e "console.log(require.resolve(\"@commitlint/config-conventional\"))")
+  # Extract npx node_modules from PATH (first entry ending in .bin)
+  npx_bin=$(echo "$PATH" | tr ":" "\n" | grep "/_npx/.*/.bin$" | head -1)
+  npx_modules="${npx_bin%/.bin}"
+  config_path="$npx_modules/@commitlint/config-conventional/lib/index.js"
+
   tmp_dir=$(mktemp -d)
   tmp_config="$tmp_dir/commitlint.config.cjs"
   trap "rm -rf \"$tmp_dir\"" EXIT
+
   echo "module.exports = { extends: [\"$config_path\"] };" > "$tmp_config"
   commitlint --config "$tmp_config" "$@"
 ' _ "${commitlint_args[@]}"
