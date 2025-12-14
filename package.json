@@ -19,7 +19,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "prepare": "npx -y lefthook install",
+    "prepare": "git config core.hooksPath .githooks",
     "prepublishOnly": "pnpm run rebuild",
     "build": "tsc -p tsconfig.app.json && cp -r src/prompts dist/",
     "clean": "rm -rf dist *.tsbuildinfo",
