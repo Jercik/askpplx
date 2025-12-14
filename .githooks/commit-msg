@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
+# Native Git hook - enable with: git config core.hooksPath .githooks
+# Also supports CI usage: .githooks/commit-msg --from <sha> --to <sha>
 set -euo pipefail
 
 if (( $# == 0 )); then
   echo "Usage:" >&2
-  echo "  commitlint.sh <commit-msg-file> [commitlint args...]" >&2
-  echo "  commitlint.sh --last|--from <sha> --to <sha> [commitlint args...]" >&2
+  echo "  commit-msg <commit-msg-file>              # Git hook mode" >&2
+  echo "  commit-msg --last                         # Validate last commit" >&2
+  echo "  commit-msg --from <sha> --to <sha>        # Validate commit range" >&2
   exit 2
 fi
 
@@ -12,15 +15,17 @@ fi
 commitlint_args=()
 
 if [[ "${1:-}" == --* ]]; then
+  # CI mode: pass flags directly to commitlint
   commitlint_args=("$@")
 else
-  commit_msg_path="$1"
+  # Git hook mode: validate commit message file
+  commit_msg_file="$1"
   shift
-  if [[ ! -f "$commit_msg_path" ]]; then
-    echo "Commit message file not found: $commit_msg_path" >&2
+  if [[ ! -f "$commit_msg_file" ]]; then
+    echo "Commit message file not found: $commit_msg_file" >&2
     exit 2
   fi
-  commitlint_args=(--edit "$commit_msg_path" "$@")
+  commitlint_args=(--edit "$commit_msg_file" "$@")
 fi
 
 # Add --verbose if not already present
@@ -38,10 +43,14 @@ fi
 # Run commitlint via npx with @commitlint/config-conventional.
 # Extract the npx cache node_modules path from PATH and create a temp config
 # with an absolute path to the config-conventional module.
-npx -y -p @commitlint/cli -p @commitlint/config-conventional sh -c '
+npx -y -p @commitlint/cli@20.2.0 -p @commitlint/config-conventional@20.2.0 sh -c '
   set -e
   # Extract npx node_modules from PATH (first entry ending in .bin)
   npx_bin=$(echo "$PATH" | tr ":" "\n" | grep "/_npx/.*/.bin$" | head -1)
+  if [[ -z "$npx_bin" ]]; then
+    echo "Error: Could not locate npx cache directory in PATH" >&2
+    exit 1
+  fi
   npx_modules="${npx_bin%/.bin}"
   config_path="$npx_modules/@commitlint/config-conventional/lib/index.js"
 
