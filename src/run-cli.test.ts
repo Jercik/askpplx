@@ -28,6 +28,15 @@ function createMockResult(
       inputTokens: 10,
       outputTokens: 20,
       totalTokens: 30,
+      inputTokenDetails: {
+        noCacheTokens: undefined,
+        cacheReadTokens: undefined,
+        cacheWriteTokens: undefined,
+      },
+      outputTokenDetails: {
+        textTokens: undefined,
+        reasoningTokens: undefined,
+      },
     },
     providerMetadata: {
       perplexity: {

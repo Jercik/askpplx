@@ -41,25 +41,25 @@
     "node": ">=22.14.0"
   },
   "dependencies": {
-    "@ai-sdk/perplexity": "^2.0.22",
+    "@ai-sdk/perplexity": "^3.0.5",
     "@commander-js/extra-typings": "^14.0.0",
-    "ai": "^5.0.113",
+    "ai": "^6.0.31",
     "commander": "^14.0.2",
     "conf": "^15.0.2",
-    "zod": "^4.2.1"
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.6.1",
-    "@types/node": "^24.10.4",
-    "@vitest/coverage-v8": "^4.0.15",
+    "@types/node": "^25.0.7",
+    "@vitest/coverage-v8": "^4.0.17",
     "eslint": "^9.39.2",
     "eslint-config-axkit": "^1.0.0",
-    "fta-check": "^1.5.0",
+    "fta-check": "^1.5.1",
     "fta-cli": "^3.0.0",
-    "knip": "^5.74.0",
+    "knip": "^5.80.2",
     "prettier": "3.7.4",
     "semantic-release": "^25.0.2",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.15"
+    "vitest": "^4.0.17"
   }
 }
