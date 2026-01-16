@@ -101,6 +101,7 @@ const program = new Command()
       const message =
         error instanceof Error ? error.message : "An unexpected error occurred";
       console.error(`Error: ${message}`);
+      // eslint-disable-next-line require-atomic-updates -- False positive: no race condition in catch block
       process.exitCode = 1;
     }
   });
