@@ -74,12 +74,12 @@ function createMockDeps(
     streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult()),
     loadSystemPrompt: vi.fn().mockResolvedValue(DEFAULT_SYSTEM_PROMPT),
     getApiKey: vi.fn().mockReturnValue("test-api-key"),
-    output: vi.fn(),
-    writeStream: vi.fn(),
-    errorOutput: vi.fn(),
+    output: vi.fn<(message: string) => void>(),
+    writeStream: vi.fn<(chunk: string) => void>(),
+    errorOutput: vi.fn<(message: string) => void>(),
     exit: vi.fn() as unknown as (code: number) => never,
     ...overrides,
-  };
+  } as CliDependencies;
 }
 
 describe("formatResult", () => {
