@@ -42,23 +42,11 @@ askpplx "Latest TypeScript release notes" --json | jq -r '.sources[].url' | sort
 
 ## Agent Rule
 
-Add this rule to your `CLAUDE.md` or `AGENTS.md` to enable automatic Perplexity lookups, no need to configure MCPs:
+Add this rule to your `CLAUDE.md` or `AGENTS.md`:
 
 ```markdown
-# Rule: `askpplx` CLI Usage
+# Rule: Use `askpplx` for Current Facts
 
-**MANDATORY:** Run `npx -y askpplx --help` at the start of every agent session to learn available options and confirm the tool is working.
-
-Use `askpplx` to query Perplexity, an AI search engine combining real-time web search with advanced language models.
-
-## Why This Matters
-
-- **Ground your knowledge:** Your training data has a cutoff date. Real-time search ensures you work with current information—correct API signatures, latest versions, up-to-date best practices.
-- **Save time and resources:** A quick lookup is far cheaper than debugging hallucinated code or explaining why an approach failed. When in doubt, verify first.
-- **Reduce false confidence:** Even when you feel certain, external verification catches subtle errors before they compound into larger problems.
-- **Stay current:** Libraries change, APIs deprecate, patterns evolve. What was correct six months ago may be wrong today.
-
-## Usage Guidelines
-
-Use concise prompts for quick facts and focused questions for deeper topics. If results are unexpected, refine your query and ask again. Verification is fast and cheap—prefer looking up information over making assumptions.
+At the start of each session, run `npx -y askpplx --help` to verify the CLI is available and configured properly and check available options.
+When a task depends on current or uncertain external information, query `askpplx` instead of relying on memory.
 ```

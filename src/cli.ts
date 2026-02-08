@@ -10,6 +10,7 @@ import {
   maskApiKey,
   setPerplexityApiKey,
 } from "./config.js";
+import { formatRequiresHelpText } from "./format-requires-help-text.js";
 import type { CliOptions } from "./run-cli.js";
 import { runCli } from "./run-cli.js";
 import type { SearchContextSize } from "./ask-perplexity.js";
@@ -17,33 +18,18 @@ import { collectStdinText } from "./collect-stdin-text.js";
 import { resolveCliPrompt } from "./resolve-cli-prompt.js";
 
 const usageExamples = `
-About Perplexity:
-  Perplexity AI is an AI-powered search engine and answer engine that delivers
-  concise, accurate responses to user queries by combining real-time web
-  searches with advanced language models.
-
-Models:
-  sonar               Fast, lightweight for quick searches (128K context)
-  sonar-pro           Advanced multi-step research queries
-  sonar-reasoning-pro Deep reasoning with R1-1776 backend (default)
-
-JSON output (--json):
-  Returns { text, sources[], usage, providerMetadata } - not structured AI output.
-  Use jq to extract fields: --json | jq -r '.text' or '.sources[].url'
-
-System prompt:
-  Default prompt is optimized for technical/coding questions.
-  Use -s <file> or -S <text> to customize. Use -S "" to disable.
-
 Examples:
-  askpplx "What is the capital of France?" -S ""
-  askpplx "Explain quantum computing" --model sonar-pro
-  askpplx "Latest news on AI" -c medium
-  askpplx "$(cat article.txt)" -s ./summarize.md
-  askpplx "$(cat article.txt)" -S "Summarize this article"
+  # Quick factual lookup in plain text
+  askpplx "Node.js LTS version"
+
+  # Summarize local text from stdin (filter style)
   cat article.txt | askpplx -S "Summarize this article"
-  askpplx "Node.js LTS version" --json | jq -r '.text'
-  askpplx "Show reasoning" --show-thinking`;
+
+  # Extract citation URLs for source auditing
+  askpplx "Latest TypeScript release notes" --json | jq -r '.sources[].url' | sort -u
+
+  # Capture only answer text for scripts
+  askpplx "What changed in React 19?" --json | jq -r '.text'`;
 
 const program = new Command()
   .name(packageJson.name)
@@ -64,6 +50,10 @@ const program = new Command()
   .option("--show-thinking", "Show model thinking/reasoning blocks")
   .option("--no-stream", "Disable streaming output")
   .addOption(new Option("--no-streaming", "Alias for --no-stream").hideHelp())
+  .addHelpText(
+    "before",
+    () => `${formatRequiresHelpText(getPerplexityApiKey())}\n`,
+  )
   .addHelpText("after", usageExamples)
   .action(async (prompt, options) => {
     try {
