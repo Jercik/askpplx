@@ -36,30 +36,30 @@
     "typecheck": "tsc -b --noEmit"
   },
   "keywords": [],
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.30.1",
   "engines": {
     "node": ">=22.14.0"
   },
   "dependencies": {
-    "@ai-sdk/perplexity": "^3.0.5",
+    "@ai-sdk/perplexity": "^3.0.19",
     "@commander-js/extra-typings": "^14.0.0",
-    "ai": "^6.0.31",
-    "commander": "^14.0.2",
-    "conf": "^15.0.2",
-    "zod": "^4.3.5"
+    "ai": "^6.0.97",
+    "commander": "^14.0.3",
+    "conf": "^15.1.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.6.1",
-    "@types/node": "^25.0.7",
-    "@vitest/coverage-v8": "^4.0.17",
-    "eslint": "^9.39.2",
-    "eslint-config-axkit": "^1.1.0",
+    "@types/node": "^25.3.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "eslint": "^10.0.1",
+    "eslint-config-axkit": "^1.2.1",
     "fta-check": "^1.5.1",
     "fta-cli": "^3.0.0",
-    "knip": "^5.80.2",
-    "prettier": "3.7.4",
-    "semantic-release": "^25.0.2",
+    "knip": "^5.85.0",
+    "prettier": "3.8.1",
+    "semantic-release": "^25.0.3",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.17"
+    "vitest": "^4.0.18"
   }
 }

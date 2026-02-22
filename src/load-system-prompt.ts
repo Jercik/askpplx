@@ -16,11 +16,20 @@ export async function loadSystemPrompt(customPath?: string): Promise<string> {
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code;
     if (code === "ENOENT") {
-      throw new Error(`System prompt file not found: ${promptPath}`);
+      throw new Error(`System prompt file not found: ${promptPath}`, {
+        cause: error,
+      });
     }
     if (code === "EACCES") {
-      throw new Error(`Permission denied reading system prompt: ${promptPath}`);
+      throw new Error(
+        `Permission denied reading system prompt: ${promptPath}`,
+        {
+          cause: error,
+        },
+      );
     }
-    throw new Error(`Failed to read system prompt file: ${promptPath}`);
+    throw new Error(`Failed to read system prompt file: ${promptPath}`, {
+      cause: error,
+    });
   }
 }
