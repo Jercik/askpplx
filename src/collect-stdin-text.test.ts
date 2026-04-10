@@ -40,7 +40,7 @@ describe("collectStdinText", () => {
   });
 
   it("throws when input exceeds maxBytes", async () => {
-    await expect(collectStdinText(chunks(["hello"]), 4)).rejects.toThrowError(
+    await expect(collectStdinText(chunks(["hello"]), 4)).rejects.toThrow(
       "Input too large",
     );
   });
