@@ -1,3 +1,4 @@
+import type { Mock } from "vitest";
 import { describe, expect, it, vi } from "vitest";
 
 import type { AskPerplexityResult } from "./ask-perplexity.js";
@@ -67,9 +68,13 @@ function createMockStreamResult(chunks: string[] = ["Streamed ", "response"]) {
   };
 }
 
+type MockCliDependencies = CliDependencies & {
+  exit: Mock<(code: number) => void>;
+};
+
 function createMockDeps(
   overrides: Partial<CliDependencies> = {},
-): CliDependencies {
+): MockCliDependencies {
   return {
     streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult()),
     loadSystemPrompt: vi.fn().mockResolvedValue(DEFAULT_SYSTEM_PROMPT),
@@ -77,9 +82,9 @@ function createMockDeps(
     output: vi.fn<(message: string) => void>(),
     writeStream: vi.fn<(chunk: string) => void>(),
     errorOutput: vi.fn<(message: string) => void>(),
-    exit: vi.fn() as unknown as (code: number) => never,
     ...overrides,
-  } as CliDependencies;
+    exit: vi.fn<(code: number) => void>(),
+  };
 }
 
 describe("formatResult", () => {
@@ -103,12 +108,34 @@ describe("formatResult", () => {
     const result = createMockResult({ text: "Hello world" });
 
     const output = formatResult(result, { json: true, showThinking: false });
-    const parsed = JSON.parse(output) as AskPerplexityResult;
 
-    expect(parsed.text).toBe("Hello world");
-    expect(parsed.sources).toEqual(result.sources);
-    expect(parsed.usage).toEqual(result.usage);
-    expect(parsed.providerMetadata).toEqual(result.providerMetadata);
+    expect(JSON.parse(output)).toEqual({
+      text: "Hello world",
+      sources: [
+        {
+          type: "source",
+          sourceType: "url",
+          id: "test-id",
+          url: "https://example.com",
+        },
+      ],
+      usage: {
+        inputTokens: 10,
+        outputTokens: 20,
+        totalTokens: 30,
+        inputTokenDetails: {},
+        outputTokenDetails: {},
+      },
+      providerMetadata: {
+        perplexity: {
+          images: [],
+          usage: {
+            citationTokens: 5,
+            numSearchQueries: 1,
+          },
+        },
+      },
+    });
   });
 
   it("strips think blocks by default", () => {
@@ -189,8 +216,9 @@ describe("runCli", () => {
 
       const outputCall = vi.mocked(deps.output).mock.calls[0]?.[0];
       expect(outputCall).toBeDefined();
-      const parsed = JSON.parse(outputCall as string) as AskPerplexityResult;
-      expect(parsed.text).toBe("API response");
+      expect(JSON.parse(outputCall ?? "")).toMatchObject({
+        text: "API response",
+      });
     });
   });
 

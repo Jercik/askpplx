@@ -29,7 +29,7 @@ export type CliDependencies = {
   output: (message: string) => void;
   writeStream: (chunk: string) => void;
   errorOutput: (message: string) => void;
-  exit: (code: number) => never;
+  exit: (code: number) => void;
 };
 
 const defaultDependencies: CliDependencies = {
@@ -92,6 +92,7 @@ export async function runCli(
         "Or store it: askpplx config --set-api-key 'your-api-key'",
     );
     deps.exit(1);
+    return;
   }
 
   const systemPrompt =

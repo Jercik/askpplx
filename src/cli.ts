@@ -13,7 +13,6 @@ import {
 import { formatRequiresHelpText } from "./format-requires-help-text.js";
 import type { CliOptions } from "./run-cli.js";
 import { runCli } from "./run-cli.js";
-import type { SearchContextSize } from "./ask-perplexity.js";
 import { collectStdinText } from "./collect-stdin-text.js";
 import { resolveCliPrompt } from "./resolve-cli-prompt.js";
 
@@ -81,7 +80,7 @@ const program = new Command()
         json: Boolean(options.json),
         system: options.system,
         systemText: options.systemText,
-        context: options.context as SearchContextSize | undefined,
+        context: options.context,
         showThinking: Boolean(options.showThinking),
         stream: options.stream && options.streaming,
       };
