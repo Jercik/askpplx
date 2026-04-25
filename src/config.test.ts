@@ -1,4 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  clearPerplexityApiKey,
+  getConfigPath,
+  getPerplexityApiKey,
+  maskApiKey,
+  setPerplexityApiKey,
+} from "./config.js";
 
 // Mock conf before importing config.ts (lazy singleton instantiates on first use)
 const { getMock, setMock, deleteMock, pathMock } = vi.hoisted(() => ({
@@ -17,21 +24,13 @@ vi.mock("conf", () => ({
   },
 }));
 
-import {
-  clearPerplexityApiKey,
-  getConfigPath,
-  getPerplexityApiKey,
-  maskApiKey,
-  setPerplexityApiKey,
-} from "./config.js";
-
 describe("config", () => {
   const originalEnvironment = process.env;
 
   beforeEach(() => {
     vi.resetAllMocks();
     process.env = { ...originalEnvironment };
-    delete process.env["PERPLEXITY_API_KEY"];
+    delete process.env.PERPLEXITY_API_KEY;
   });
 
   afterEach(() => {
@@ -40,7 +39,7 @@ describe("config", () => {
 
   describe("getPerplexityApiKey", () => {
     it("returns env var when set", () => {
-      process.env["PERPLEXITY_API_KEY"] = "env-key";
+      process.env.PERPLEXITY_API_KEY = "env-key";
       getMock.mockReturnValue("stored-key");
 
       expect(getPerplexityApiKey()).toBe("env-key");
@@ -54,7 +53,7 @@ describe("config", () => {
     });
 
     it("env var takes precedence over stored key", () => {
-      process.env["PERPLEXITY_API_KEY"] = "env-key";
+      process.env.PERPLEXITY_API_KEY = "env-key";
       getMock.mockReturnValue("stored-key");
 
       expect(getPerplexityApiKey()).toBe("env-key");
@@ -68,7 +67,7 @@ describe("config", () => {
     it("empty env var takes precedence (explicit override)", () => {
       // This tests the ?? behavior: empty string is not nullish,
       // so it's treated as an explicit "use this value" override
-      process.env["PERPLEXITY_API_KEY"] = "";
+      process.env.PERPLEXITY_API_KEY = "";
       getMock.mockReturnValue("stored-key");
 
       expect(getPerplexityApiKey()).toBe("");

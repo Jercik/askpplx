@@ -13,9 +13,7 @@ export async function collectStdinText(
     totalBytes += Buffer.byteLength(chunk, "utf8");
     if (totalBytes > maxBytes) {
       const limitMegabytes = Math.round(maxBytes / 1024 / 1024);
-      throw new Error(
-        `Input too large: exceeds ${String(limitMegabytes)}MB limit`,
-      );
+      throw new Error(`Input too large: exceeds ${String(limitMegabytes)}MB limit`);
     }
     chunks.push(chunk);
   }

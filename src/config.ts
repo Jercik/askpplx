@@ -15,14 +15,12 @@ const schema = {
 let configInstance: Conf<ConfigSchema> | undefined;
 
 function getConfig(): Conf<ConfigSchema> {
-  if (!configInstance) {
-    configInstance = new Conf<ConfigSchema>({
-      projectName: packageJson.name,
-      projectVersion: packageJson.version,
-      projectSuffix: "",
-      schema,
-    });
-  }
+  configInstance ??= new Conf<ConfigSchema>({
+    projectName: packageJson.name,
+    projectVersion: packageJson.version,
+    projectSuffix: "",
+    schema,
+  });
   return configInstance;
 }
 
@@ -31,9 +29,7 @@ function getConfig(): Conf<ConfigSchema> {
  * Note: An empty PERPLEXITY_API_KEY="" explicitly disables stored config.
  */
 export function getPerplexityApiKey(): string | undefined {
-  return (
-    process.env["PERPLEXITY_API_KEY"] ?? getConfig().get("perplexityApiKey")
-  );
+  return process.env.PERPLEXITY_API_KEY ?? getConfig().get("perplexityApiKey");
 }
 
 /** Store API key in persistent config. */
@@ -57,7 +53,11 @@ export function getConfigPath(): string {
  * Returns undefined if key is undefined or empty.
  */
 export function maskApiKey(key?: string): string | undefined {
-  if (!key) return undefined;
-  if (key.length <= 16) return "****";
+  if (!key) {
+    return undefined;
+  }
+  if (key.length <= 16) {
+    return "****";
+  }
   return `${key.slice(0, 4)}...${key.slice(-4)}`;
 }

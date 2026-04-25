@@ -49,19 +49,14 @@ const program = new Command()
   .option("--show-thinking", "Show model thinking/reasoning blocks")
   .option("--no-stream", "Disable streaming output")
   .addOption(new Option("--no-streaming", "Alias for --no-stream").hideHelp())
-  .addHelpText(
-    "before",
-    () => `${formatRequiresHelpText(getPerplexityApiKey())}\n`,
-  )
+  .addHelpText("before", () => `${formatRequiresHelpText(getPerplexityApiKey())}\n`)
   .addHelpText("after", usageExamples)
   .action(async (prompt, options) => {
     try {
       let stdinText: string | undefined;
       if (!prompt && !process.stdin.isTTY) {
         process.stdin.setEncoding("utf8");
-        stdinText = await collectStdinText(
-          process.stdin as AsyncIterable<string>,
-        );
+        stdinText = await collectStdinText(process.stdin as AsyncIterable<string>);
       }
 
       const effectivePrompt = resolveCliPrompt(prompt, stdinText);
@@ -87,10 +82,8 @@ const program = new Command()
 
       await runCli(effectivePrompt, cliOptions);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "An unexpected error occurred";
+      const message = error instanceof Error ? error.message : "An unexpected error occurred";
       console.error(`Error: ${message}`);
-      // eslint-disable-next-line require-atomic-updates -- False positive: no race condition in catch block
       process.exitCode = 1;
     }
   });
@@ -126,10 +119,7 @@ const configCommand = program
           configCommand.help({ error: true });
         }
       } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred";
+        const message = error instanceof Error ? error.message : "An unexpected error occurred";
         console.error(`Error: ${message}`);
         process.exitCode = 1;
       }

@@ -12,9 +12,7 @@ vi.mock("./config.js", () => ({
 
 const DEFAULT_SYSTEM_PROMPT = "You are a helpful assistant.";
 
-function createMockResult(
-  overrides: Partial<AskPerplexityResult> = {},
-): AskPerplexityResult {
+function createMockResult(overrides: Partial<AskPerplexityResult> = {}): AskPerplexityResult {
   return {
     text: "Test response",
     sources: [
@@ -72,9 +70,7 @@ type MockCliDependencies = CliDependencies & {
   exit: Mock<(code: number) => void>;
 };
 
-function createMockDeps(
-  overrides: Partial<CliDependencies> = {},
-): MockCliDependencies {
+function createMockDeps(overrides: Partial<CliDependencies> = {}): MockCliDependencies {
   return {
     streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult()),
     loadSystemPrompt: vi.fn().mockResolvedValue(DEFAULT_SYSTEM_PROMPT),
@@ -180,11 +176,7 @@ describe("runCli", () => {
     it("passes searchContextSize when context option provided", async () => {
       const deps = createMockDeps();
 
-      await runCli(
-        "test prompt",
-        { model: "sonar", context: "low", stream: false },
-        deps,
-      );
+      await runCli("test prompt", { model: "sonar", context: "low", stream: false }, deps);
 
       expect(deps.streamPerplexity).toHaveBeenCalledWith(
         expect.objectContaining({ searchContextSize: "low" }),
@@ -193,23 +185,17 @@ describe("runCli", () => {
 
     it("outputs text with sources", async () => {
       const deps = createMockDeps({
-        streamPerplexity: vi
-          .fn()
-          .mockReturnValue(createMockStreamResult(["API response"])),
+        streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult(["API response"])),
       });
 
       await runCli("test prompt", { model: "sonar", stream: false }, deps);
 
-      expect(deps.output).toHaveBeenCalledWith(
-        "API response\n\nSources:\n[1] https://example.com",
-      );
+      expect(deps.output).toHaveBeenCalledWith("API response\n\nSources:\n[1] https://example.com");
     });
 
     it("outputs JSON when json option is true", async () => {
       const deps = createMockDeps({
-        streamPerplexity: vi
-          .fn()
-          .mockReturnValue(createMockStreamResult(["API response"])),
+        streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult(["API response"])),
       });
 
       await runCli("test prompt", { model: "sonar", json: true }, deps);
@@ -246,9 +232,7 @@ describe("runCli", () => {
 
       await runCli("test prompt", { model: "sonar" }, deps);
 
-      expect(deps.output).toHaveBeenCalledWith(
-        "\n\nSources:\n[1] https://example.com",
-      );
+      expect(deps.output).toHaveBeenCalledWith("\n\nSources:\n[1] https://example.com");
     });
   });
 

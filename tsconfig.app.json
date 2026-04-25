@@ -1,17 +1,16 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    /* Transpiling with TypeScript */
+    "module": "NodeNext",
+    "lib": ["ES2025", "ESNext.Array", "ESNext.Error"],
+    "types": ["node"],
     "outDir": "./dist",
     "rootDir": "./src",
     "composite": true,
+    "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "types": ["node"],
-    "rewriteRelativeImportExtensions": true,
-
-    /* Not running in the DOM */
-    "lib": ["es2022"]
+    "rewriteRelativeImportExtensions": true
   },
   "include": ["src/**/*.ts", "types/**/*.d.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.*", "**/*.spec.*"]

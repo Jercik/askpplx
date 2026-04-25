@@ -1,18 +1,11 @@
-import type {
-  AskPerplexityResult,
-  SearchContextSize,
-} from "./ask-perplexity.js";
+import type { AskPerplexityResult, SearchContextSize } from "./ask-perplexity.js";
 import { streamPerplexity } from "./ask-perplexity.js";
 import { getPerplexityApiKey } from "./config.js";
 import { loadSystemPrompt } from "./load-system-prompt.js";
-import {
-  collectStreamToResult,
-  formatSources,
-  handleStreamingOutput,
-} from "./stream-output.js";
+import { collectStreamToResult, formatSources, handleStreamingOutput } from "./stream-output.js";
 import { stripThinkContent } from "./strip-think-content.js";
 
-export type CliOptions = {
+export interface CliOptions {
   model: string;
   json?: boolean;
   system?: string;
@@ -20,9 +13,9 @@ export type CliOptions = {
   context?: SearchContextSize;
   showThinking?: boolean;
   stream?: boolean;
-};
+}
 
-export type CliDependencies = {
+export interface CliDependencies {
   streamPerplexity: typeof streamPerplexity;
   loadSystemPrompt: typeof loadSystemPrompt;
   getApiKey: () => string | undefined;
@@ -30,7 +23,7 @@ export type CliDependencies = {
   writeStream: (chunk: string) => void;
   errorOutput: (message: string) => void;
   exit: (code: number) => void;
-};
+}
 
 const defaultDependencies: CliDependencies = {
   streamPerplexity,
@@ -49,18 +42,13 @@ const defaultDependencies: CliDependencies = {
   exit: (code) => process.exit(code),
 };
 
-type FormatOptions = {
+interface FormatOptions {
   json: boolean;
   showThinking: boolean;
-};
+}
 
-export function formatResult(
-  result: AskPerplexityResult,
-  options: FormatOptions,
-): string {
-  const text = options.showThinking
-    ? result.text
-    : stripThinkContent(result.text);
+export function formatResult(result: AskPerplexityResult, options: FormatOptions): string {
+  const text = options.showThinking ? result.text : stripThinkContent(result.text);
 
   if (options.json) {
     return JSON.stringify(
@@ -95,8 +83,7 @@ export async function runCli(
     return;
   }
 
-  const systemPrompt =
-    options.systemText ?? (await deps.loadSystemPrompt(options.system));
+  const systemPrompt = options.systemText ?? (await deps.loadSystemPrompt(options.system));
 
   const stream = deps.streamPerplexity({
     apiKey,
@@ -109,11 +96,7 @@ export async function runCli(
   const useStreaming = options.stream !== false && !options.json;
 
   if (useStreaming) {
-    await handleStreamingOutput(
-      stream,
-      { showThinking: options.showThinking ?? false },
-      deps,
-    );
+    await handleStreamingOutput(stream, { showThinking: options.showThinking ?? false }, deps);
   } else {
     const result = await collectStreamToResult(stream);
 

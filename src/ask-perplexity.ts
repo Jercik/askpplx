@@ -3,26 +3,24 @@ import { streamText } from "ai";
 
 export type SearchContextSize = "low" | "medium" | "high";
 
-type AskPerplexityOptions = {
+interface AskPerplexityOptions {
   apiKey: string;
   model: string;
   prompt: string;
   system?: string;
   searchContextSize?: SearchContextSize;
-};
+}
 
 export type StreamPerplexityResult = ReturnType<typeof streamText>;
 
-export type AskPerplexityResult = {
+export interface AskPerplexityResult {
   text: string;
   sources: Awaited<StreamPerplexityResult["sources"]>;
   usage: Awaited<StreamPerplexityResult["usage"]>;
   providerMetadata: Awaited<StreamPerplexityResult["providerMetadata"]>;
-};
+}
 
-export function streamPerplexity(
-  options: AskPerplexityOptions,
-): StreamPerplexityResult {
+export function streamPerplexity(options: AskPerplexityOptions): StreamPerplexityResult {
   const perplexity = createPerplexity({ apiKey: options.apiKey });
 
   return streamText({

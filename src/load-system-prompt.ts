@@ -2,11 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 const __dirname = import.meta.dirname;
-const DEFAULT_SYSTEM_PROMPT_PATH = path.join(
-  __dirname,
-  "prompts",
-  "default-system.md",
-);
+const DEFAULT_SYSTEM_PROMPT_PATH = path.join(__dirname, "prompts", "default-system.md");
 
 export async function loadSystemPrompt(customPath?: string): Promise<string> {
   const promptPath = customPath ?? DEFAULT_SYSTEM_PROMPT_PATH;
@@ -21,12 +17,9 @@ export async function loadSystemPrompt(customPath?: string): Promise<string> {
       });
     }
     if (code === "EACCES") {
-      throw new Error(
-        `Permission denied reading system prompt: ${promptPath}`,
-        {
-          cause: error,
-        },
-      );
+      throw new Error(`Permission denied reading system prompt: ${promptPath}`, {
+        cause: error,
+      });
     }
     throw new Error(`Failed to read system prompt file: ${promptPath}`, {
       cause: error,

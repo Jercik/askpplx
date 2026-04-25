@@ -1,12 +1,9 @@
-import type {
-  AskPerplexityResult,
-  StreamPerplexityResult,
-} from "./ask-perplexity.js";
+import type { AskPerplexityResult, StreamPerplexityResult } from "./ask-perplexity.js";
 
-type StreamDependencies = {
+interface StreamDependencies {
   writeStream: (chunk: string) => void;
   output: (message: string) => void;
-};
+}
 
 export function formatSources(sources: AskPerplexityResult["sources"]): string {
   if (sources.length === 0) {
