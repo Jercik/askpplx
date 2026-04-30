@@ -4,8 +4,6 @@ import { formatRequiresHelpText } from "./format-requires-help-text.js";
 
 describe("formatRequiresHelpText", () => {
   it("shows a missing-key guidance block when key is undefined", () => {
-    expect.assertions(1);
-
     expect(formatRequiresHelpText()).toBe(
       "Requires:\n" +
         "  - PERPLEXITY_API_KEY - MISSING! Set PERPLEXITY_API_KEY=<token> " +
@@ -14,8 +12,6 @@ describe("formatRequiresHelpText", () => {
   });
 
   it("shows last 4 characters when key is configured", () => {
-    expect.assertions(1);
-
     expect(formatRequiresHelpText("pplx-abcdefgh1234")).toBe(
       "Requires: PERPLEXITY_API_KEY (configured: last4=1234)",
     );

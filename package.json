@@ -47,14 +47,14 @@
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.6.1",
     "@types/node": "^25.6.0",
-    "@typescript/native-preview": "beta",
+    "@typescript/native-preview": "7.0.0-dev.20260430.1",
     "@vitest/coverage-v8": "^4.1.5",
     "fta-check": "^1.5.2",
     "fta-cli": "^3.0.0",
     "knip": "^6.9.0",
     "oxfmt": "^0.47.0",
     "oxlint": "^1.62.0",
-    "oxlint-config-j4k": "^2.3.0",
+    "oxlint-config-j4k": "^2.5.0",
     "oxlint-tsgolint": "^0.22.1",
     "semantic-release": "^25.0.3",
     "vitest": "^4.1.5"

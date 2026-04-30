@@ -58,8 +58,8 @@ importers:
         specifier: ^1.62.0
         version: 1.62.0(oxlint-tsgolint@0.22.1)
       oxlint-config-j4k:
-        specifier: ^2.3.0
-        version: 2.3.0
+        specifier: ^2.5.0
+        version: 2.5.0
       oxlint-tsgolint:
         specifier: ^0.22.1
         version: 0.22.1
@@ -2157,8 +2157,8 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
-  oxlint-config-j4k@2.3.0:
-    resolution: {integrity: sha512-v9BP28NdbYNh/++bZDbb9XtoeT6FFlYh7wSjkT7yLgIN2bSF77BGH4qgSLE5x6zuGl5vRfBmUnhlDnZJxcyRBw==}
+  oxlint-config-j4k@2.5.0:
+    resolution: {integrity: sha512-tPWrU6OcRKBcgbl73sKaJn9nDvhFwdhZJ3GKJu2/X42YcZpPekqxaa9nwb8Hjw0GmtmKApufWvJNQ6i39yOwXQ==}
     engines: {node: '>=22.19.0'}
 
   oxlint-tsgolint@0.22.1:
@@ -4467,7 +4467,7 @@ snapshots:
       '@oxfmt/binding-win32-ia32-msvc': 0.47.0
       '@oxfmt/binding-win32-x64-msvc': 0.47.0
 
-  oxlint-config-j4k@2.3.0: {}
+  oxlint-config-j4k@2.5.0: {}
 
   oxlint-tsgolint@0.22.1:
     optionalDependencies:

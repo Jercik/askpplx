@@ -104,22 +104,15 @@ function sendUserExpiryEmail(): void {
 
 // Good: Functional core (pure, testable)
 function getExpiredUsers(users: User[], cutoff: Date): User[] {
-  return users.filter(
-    (user) => user.subscriptionEndDate <= cutoff && !user.isFreeTrial,
-  );
+  return users.filter((user) => user.subscriptionEndDate <= cutoff && !user.isFreeTrial);
 }
 
 function generateExpiryEmails(users: User[]): Array<[string, string]> {
-  return users.map((user) => [
-    user.email,
-    `Your account has expired ${user.name}.`,
-  ]);
+  return users.map((user) => [user.email, `Your account has expired ${user.name}.`]);
 }
 
 // Imperative shell (orchestrates side effects)
-email.bulkSend(
-  generateExpiryEmails(getExpiredUsers(db.getUsers(), new Date())),
-);
+email.bulkSend(generateExpiryEmails(getExpiredUsers(db.getUsers(), new Date())));
 ```
 
 Test the functional core, not the shell. Core tests are fast, deterministic, and need no mocks; the shell becomes thin orchestration where bugs are easy to spot through review. If shell tests are explicitly requested, prefer integration tests over unit tests with mocks.
@@ -288,10 +281,7 @@ function isWithinDirectory(base: string, target: string): boolean {
   const resolvedBase = resolve(base);
   const resolvedTarget = resolve(target);
   // BAD: Case-sensitive comparison fails on Windows
-  return (
-    resolvedTarget.startsWith(resolvedBase + sep) ||
-    resolvedTarget === resolvedBase
-  );
+  return resolvedTarget.startsWith(resolvedBase + sep) || resolvedTarget === resolvedBase;
 }
 ```
 
@@ -425,9 +415,7 @@ Numeric enums are especially problematic—they produce reverse mappings that do
 Throw errors when framework infrastructure handles them (e.g., a backend request handler converting the throw into an HTTP 500). For operations where callers must handle failure explicitly, return a result type instead of using `try`/`catch` at the call site:
 
 ```ts
-type Result<T, E extends Error> =
-  | { ok: true; value: T }
-  | { ok: false; error: E };
+type Result<T, E extends Error> = { ok: true; value: T } | { ok: false; error: E };
 
 const parseJson = (input: string): Result<unknown, Error> => {
   try {

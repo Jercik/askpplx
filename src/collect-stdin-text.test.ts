@@ -25,29 +25,21 @@ function chunks(parts: string[]): AsyncIterable<string> {
 
 describe("collectStdinText", () => {
   it("concatenates all chunks", async () => {
-    expect.assertions(1);
-
     const text = await collectStdinText(chunks(["hello ", "world"]));
     expect(text).toBe("hello world");
   });
 
   it("returns empty string for empty input", async () => {
-    expect.assertions(1);
-
     const text = await collectStdinText(chunks([]));
     expect(text).toBe("");
   });
 
   it("allows input exactly at maxBytes", async () => {
-    expect.assertions(1);
-
     const text = await collectStdinText(chunks(["hi"]), 2);
     expect(text).toBe("hi");
   });
 
   it("throws when input exceeds maxBytes", async () => {
-    expect.assertions(1);
-
     await expect(collectStdinText(chunks(["hello"]), 4)).rejects.toThrow("Input too large");
   });
 });

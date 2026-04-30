@@ -85,8 +85,6 @@ function createMockDeps(overrides: Partial<CliDependencies> = {}): MockCliDepend
 
 describe("formatResult", () => {
   it("returns text with sources when json is false", () => {
-    expect.assertions(1);
-
     const result = createMockResult({ text: "Hello world" });
 
     const output = formatResult(result, { json: false, showThinking: false });
@@ -95,8 +93,6 @@ describe("formatResult", () => {
   });
 
   it("returns text without sources section when no sources", () => {
-    expect.assertions(1);
-
     const result = createMockResult({ text: "Hello world", sources: [] });
 
     const output = formatResult(result, { json: false, showThinking: false });
@@ -105,8 +101,6 @@ describe("formatResult", () => {
   });
 
   it("returns JSON string when json is true", () => {
-    expect.assertions(1);
-
     const result = createMockResult({ text: "Hello world" });
 
     const output = formatResult(result, { json: true, showThinking: false });
@@ -141,8 +135,6 @@ describe("formatResult", () => {
   });
 
   it("strips think blocks by default", () => {
-    expect.assertions(1);
-
     const result = createMockResult({
       text: "<think>reasoning here</think>Hello world",
     });
@@ -153,8 +145,6 @@ describe("formatResult", () => {
   });
 
   it("preserves think blocks when showThinking is true", () => {
-    expect.assertions(1);
-
     const result = createMockResult({
       text: "<think>reasoning here</think>Hello world",
     });
@@ -170,8 +160,6 @@ describe("formatResult", () => {
 describe("runCli", () => {
   describe("non-streaming mode", () => {
     it("calls streamPerplexity with correct parameters", async () => {
-      expect.assertions(1);
-
       const deps = createMockDeps();
 
       await runCli("test prompt", { model: "sonar-pro", stream: false }, deps);
@@ -186,8 +174,6 @@ describe("runCli", () => {
     });
 
     it("passes searchContextSize when context option provided", async () => {
-      expect.assertions(1);
-
       const deps = createMockDeps();
 
       await runCli("test prompt", { model: "sonar", context: "low", stream: false }, deps);
@@ -198,8 +184,6 @@ describe("runCli", () => {
     });
 
     it("outputs text with sources", async () => {
-      expect.assertions(1);
-
       const deps = createMockDeps({
         streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult(["API response"])),
       });
@@ -210,8 +194,6 @@ describe("runCli", () => {
     });
 
     it("outputs JSON when json option is true", async () => {
-      expect.assertions(1);
-
       const deps = createMockDeps({
         streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult(["API response"])),
       });
@@ -224,8 +206,6 @@ describe("runCli", () => {
 
   describe("streaming mode", () => {
     it("uses streaming by default", async () => {
-      expect.assertions(2);
-
       const deps = createMockDeps();
 
       await runCli("test prompt", { model: "sonar" }, deps);
@@ -235,8 +215,6 @@ describe("runCli", () => {
     });
 
     it("writes streamed chunks to output", async () => {
-      expect.assertions(2);
-
       const deps = createMockDeps();
 
       await runCli("test prompt", { model: "sonar" }, deps);
@@ -246,8 +224,6 @@ describe("runCli", () => {
     });
 
     it("outputs sources after streaming completes", async () => {
-      expect.assertions(1);
-
       const deps = createMockDeps();
 
       await runCli("test prompt", { model: "sonar" }, deps);
@@ -258,8 +234,6 @@ describe("runCli", () => {
 
   describe("common behavior", () => {
     it("loads default system prompt when no custom path provided", async () => {
-      expect.assertions(1);
-
       const deps = createMockDeps();
 
       await runCli("test prompt", { model: "sonar", stream: false }, deps);
@@ -268,8 +242,6 @@ describe("runCli", () => {
     });
 
     it("loads custom system prompt when path provided", async () => {
-      expect.assertions(2);
-
       const customPrompt = "Custom system prompt";
       const deps = createMockDeps({
         loadSystemPrompt: vi.fn().mockResolvedValue(customPrompt),
@@ -288,8 +260,6 @@ describe("runCli", () => {
     });
 
     it("exits with error when API key is missing", async () => {
-      expect.assertions(2);
-
       const deps = createMockDeps({
         getApiKey: vi.fn(),
       });
