@@ -20,15 +20,15 @@
   ],
   "type": "module",
   "scripts": {
-    "prepack": "pnpm run rebuild",
-    "prepare": "git config core.hooksPath .githooks",
     "build": "tsgo -p tsconfig.app.json && cp -r src/prompts dist/",
     "clean": "rm -rf dist *.tsbuildinfo",
-    "format": "oxfmt .",
-    "format:check": "oxfmt --check .",
+    "format": "oxfmt --config .oxfmtrc.json .",
+    "format:check": "oxfmt --check --config .oxfmtrc.json .",
     "fta": "fta-check",
     "knip": "knip",
     "lint": "oxlint --deny-warnings --report-unused-disable-directives .",
+    "prepack": "pnpm run rebuild",
+    "prepare": "git config core.hooksPath .githooks",
     "rebuild": "pnpm run clean && pnpm run build",
     "start": "pnpm -s run rebuild && node --env-file=.env bin/askpplx",
     "test": "vitest run",
@@ -37,12 +37,12 @@
     "typecheck": "tsgo -b --noEmit"
   },
   "dependencies": {
-    "@ai-sdk/perplexity": "^3.0.29",
+    "@ai-sdk/perplexity": "^3.0.30",
     "@commander-js/extra-typings": "^14.0.0",
-    "ai": "^6.0.168",
+    "ai": "^6.0.170",
     "commander": "^14.0.3",
     "conf": "^15.1.0",
-    "zod": "^4.3.6"
+    "zod": "^4.4.1"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.6.1",
@@ -51,11 +51,11 @@
     "@vitest/coverage-v8": "^4.1.5",
     "fta-check": "^1.5.2",
     "fta-cli": "^3.0.0",
-    "knip": "^6.6.3",
-    "oxfmt": "^0.46.0",
-    "oxlint": "^1.61.0",
+    "knip": "^6.9.0",
+    "oxfmt": "^0.47.0",
+    "oxlint": "^1.62.0",
     "oxlint-config-j4k": "^2.3.0",
-    "oxlint-tsgolint": "^0.22.0",
+    "oxlint-tsgolint": "^0.22.1",
     "semantic-release": "^25.0.3",
     "vitest": "^4.1.5"
   },

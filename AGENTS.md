@@ -178,19 +178,6 @@ Unlike production code that handles varied inputs, tests verify specific cases. 
 
 Use test utilities for setup and data preparation—fixtures, builders, factories, mock configuration—but never for computing expected values. Keep assertion logic in the test body with literal expectations.
 
-# Rule: Package Manager Execution
-
-How different package manager commands resolve binaries:
-
-| Command           | Behavior                                                                |
-| ----------------- | ----------------------------------------------------------------------- |
-| `pnpm exec foo`   | Runs from `./node_modules/.bin`; falls back to system PATH              |
-| `pnpx foo`        | Always fetches from registry (uses dlx cache); ignores local installs   |
-| `npx foo`         | Checks local `node_modules/.bin` → global → downloads from registry     |
-| `npx foo@version` | Resolves version, uses local if exact match exists, otherwise downloads |
-
-`pnpx` is an alias for `pnpm dlx`.
-
 # Rule: Parse, Don't Validate
 
 When checking input data, return a refined type that preserves the knowledge gained—don't just validate and discard. Validation functions that return `void` or throw errors force callers to re-check conditions or handle "impossible" cases. Parsing functions that return more precise types eliminate redundant checks and let the compiler catch inconsistencies.
@@ -623,7 +610,7 @@ TypeScript globs are intentionally limited and differ from bash/zsh globs: `*`, 
 
 # Rule: Zod `.nullish()` for Backend Fields That May Be Absent
 
-When a Zod schema validates an external API response, fields that the producer may either set to `null` or omit entirely must accept both. `.nullable()` accepts `null` but rejects `undefined`; `.optional()` accepts `undefined` but rejects `null`; `.nullish()` accepts both.
+Default to `.nullish()` for Zod response-schema fields whose producer you don't fully control — it's the only modifier that accepts both `null` and a missing key. `.nullable()` rejects `undefined`; `.optional()` rejects `null`; `.nullish()` accepts both.
 
 ```ts
 import * as z from "zod";
@@ -642,7 +629,7 @@ const Customer = z.object({
 });
 ```
 
-Default to `.nullish()` for response fields where you don't fully control the producer. The failure mode is silent and severe: a single missing key throws a `ZodError` from `.parse()`, which often runs inside an auth callback or request handler that turns the throw into a logout, redirect, or 500 — symptoms far removed from the schema mismatch.
+The failure mode is silent and severe: a single missing key throws a `ZodError` from `.parse()`, which often runs inside an auth callback or request handler that turns the throw into a logout, redirect, or 500 — symptoms far removed from the schema mismatch.
 
 # Rule: Zod Schema Naming
 

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   clearPerplexityApiKey,
   getConfigPath,
@@ -24,94 +24,145 @@ vi.mock("conf", () => ({
   },
 }));
 
+const originalApiKey = process.env.PERPLEXITY_API_KEY;
+
+function withCleanConfigState(run: () => void): void {
+  vi.resetAllMocks();
+  delete process.env.PERPLEXITY_API_KEY;
+
+  try {
+    run();
+  } finally {
+    if (originalApiKey === undefined) {
+      delete process.env.PERPLEXITY_API_KEY;
+    } else {
+      process.env.PERPLEXITY_API_KEY = originalApiKey;
+    }
+  }
+}
+
 describe("config", () => {
-  const originalEnvironment = process.env;
-
-  beforeEach(() => {
-    vi.resetAllMocks();
-    process.env = { ...originalEnvironment };
-    delete process.env.PERPLEXITY_API_KEY;
-  });
-
-  afterEach(() => {
-    process.env = originalEnvironment;
-  });
-
   describe("getPerplexityApiKey", () => {
     it("returns env var when set", () => {
-      process.env.PERPLEXITY_API_KEY = "env-key";
-      getMock.mockReturnValue("stored-key");
+      expect.assertions(1);
 
-      expect(getPerplexityApiKey()).toBe("env-key");
+      withCleanConfigState(() => {
+        process.env.PERPLEXITY_API_KEY = "env-key";
+        getMock.mockReturnValue("stored-key");
+
+        expect(getPerplexityApiKey()).toBe("env-key");
+      });
     });
 
     it("returns stored key when env var is not set", () => {
-      getMock.mockReturnValue("stored-key");
+      expect.assertions(2);
 
-      expect(getPerplexityApiKey()).toBe("stored-key");
-      expect(getMock).toHaveBeenCalledWith("perplexityApiKey");
+      withCleanConfigState(() => {
+        getMock.mockReturnValue("stored-key");
+
+        expect(getPerplexityApiKey()).toBe("stored-key");
+        expect(getMock).toHaveBeenCalledWith("perplexityApiKey");
+      });
     });
 
     it("env var takes precedence over stored key", () => {
-      process.env.PERPLEXITY_API_KEY = "env-key";
-      getMock.mockReturnValue("stored-key");
+      expect.assertions(2);
 
-      expect(getPerplexityApiKey()).toBe("env-key");
-      expect(getMock).not.toHaveBeenCalled();
+      withCleanConfigState(() => {
+        process.env.PERPLEXITY_API_KEY = "env-key";
+        getMock.mockReturnValue("stored-key");
+
+        expect(getPerplexityApiKey()).toBe("env-key");
+        expect(getMock).not.toHaveBeenCalled();
+      });
     });
 
     it("returns undefined when neither env var nor stored key exists", () => {
-      expect(getPerplexityApiKey()).toBeUndefined();
+      expect.assertions(1);
+
+      withCleanConfigState(() => {
+        expect(getPerplexityApiKey()).toBeUndefined();
+      });
     });
 
     it("empty env var takes precedence (explicit override)", () => {
-      // This tests the ?? behavior: empty string is not nullish,
-      // so it's treated as an explicit "use this value" override
-      process.env.PERPLEXITY_API_KEY = "";
-      getMock.mockReturnValue("stored-key");
+      expect.assertions(1);
 
-      expect(getPerplexityApiKey()).toBe("");
+      withCleanConfigState(() => {
+        process.env.PERPLEXITY_API_KEY = "";
+        getMock.mockReturnValue("stored-key");
+
+        expect(getPerplexityApiKey()).toBe("");
+      });
     });
   });
 
   describe("setPerplexityApiKey", () => {
     it("stores API key in config", () => {
-      setPerplexityApiKey("new-key");
+      expect.assertions(1);
 
-      expect(setMock).toHaveBeenCalledWith("perplexityApiKey", "new-key");
+      withCleanConfigState(() => {
+        setPerplexityApiKey("new-key");
+
+        expect(setMock).toHaveBeenCalledWith("perplexityApiKey", "new-key");
+      });
     });
   });
 
   describe("clearPerplexityApiKey", () => {
     it("removes API key from config", () => {
-      clearPerplexityApiKey();
+      expect.assertions(1);
 
-      expect(deleteMock).toHaveBeenCalledWith("perplexityApiKey");
+      withCleanConfigState(() => {
+        clearPerplexityApiKey();
+
+        expect(deleteMock).toHaveBeenCalledWith("perplexityApiKey");
+      });
     });
   });
 
   describe("getConfigPath", () => {
     it("returns config file path", () => {
-      expect(getConfigPath()).toBe("/mock/path/config.json");
+      expect.assertions(1);
+
+      withCleanConfigState(() => {
+        expect(getConfigPath()).toBe("/mock/path/config.json");
+      });
     });
   });
 
   describe("maskApiKey", () => {
     it("returns undefined for undefined input", () => {
-      expect(maskApiKey()).toBeUndefined();
+      expect.assertions(1);
+
+      withCleanConfigState(() => {
+        expect(maskApiKey()).toBeUndefined();
+      });
     });
 
     it("returns undefined for empty string", () => {
-      expect(maskApiKey("")).toBeUndefined();
+      expect.assertions(1);
+
+      withCleanConfigState(() => {
+        expect(maskApiKey("")).toBeUndefined();
+      });
     });
 
     it("returns **** for short keys (16 chars or less)", () => {
-      expect(maskApiKey("short")).toBe("****");
-      expect(maskApiKey("1234567890123456")).toBe("****"); // exactly 16 chars
+      expect.assertions(2);
+
+      withCleanConfigState(() => {
+        expect(maskApiKey("short")).toBe("****");
+        expect(maskApiKey("1234567890123456")).toBe("****");
+      });
     });
 
     it("masks long keys showing first 4 and last 4", () => {
-      expect(maskApiKey("pplx-1234567890abcdef")).toBe("pplx...cdef");
+      expect.assertions(1);
+
+      withCleanConfigState(() => {
+        expect(maskApiKey("pplx-1234567890abcdef")).toBe("pplx...cdef");
+      });
     });
   });
 });
