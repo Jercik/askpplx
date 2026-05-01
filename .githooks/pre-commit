@@ -44,19 +44,15 @@ EOF
 
 if [[ -f pnpm-lock.yaml ]] && command -v pnpm >/dev/null 2>&1; then
   if has_staged_changes package.json pnpm-lock.yaml pnpm-workspace.yaml; then
+    # Order matters: dedupe is the cheaper read-only check, so fail fast on
+    # lockfile bloat before the heavier lockfile-vs-package.json sync check.
     pnpm dedupe --check
     pnpm install --frozen-lockfile --ignore-scripts
   fi
 fi
 
-staged_files=()
-while IFS= read -r -d '' file; do
-  staged_files+=("$file")
-done < <(git diff --cached --name-only --diff-filter=ACMR -z)
-
-if [[ "${#staged_files[@]}" -gt 0 ]]; then
-  run_script "format"
-  git add -- "${staged_files[@]}"
+if has_staged_changes; then
+  run_script "format:check"
 fi
 
 run_script "knip"
