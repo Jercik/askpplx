@@ -37,9 +37,9 @@
     "typecheck": "tsgo -b --noEmit"
   },
   "dependencies": {
-    "@ai-sdk/perplexity": "^3.0.30",
+    "@ai-sdk/perplexity": "^3.0.31",
     "@commander-js/extra-typings": "^14.0.0",
-    "ai": "^6.0.170",
+    "ai": "^6.0.172",
     "commander": "^14.0.3",
     "conf": "^15.1.0",
     "zod": "^4.4.1"
@@ -54,7 +54,7 @@
     "knip": "^6.9.0",
     "oxfmt": "^0.47.0",
     "oxlint": "^1.62.0",
-    "oxlint-config-j4k": "^2.5.0",
+    "oxlint-config-j4k": "^2.6.0",
     "oxlint-tsgolint": "^0.22.1",
     "semantic-release": "^25.0.3",
     "vitest": "^4.1.5"
