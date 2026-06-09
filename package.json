@@ -19,6 +19,9 @@
     "LICENSE"
   ],
   "type": "module",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsgo -p tsconfig.app.json && cp -r src/prompts dist/",
     "clean": "rm -rf dist *.tsbuildinfo",
