@@ -26,7 +26,7 @@ jobs:
           node-version: "24"
 
       - name: Cache conventional-commit-msg download
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.npm
           key: npm-conventional-commit-msg-${{ env.COMMITLINT_PACKAGE_VERSION }}
