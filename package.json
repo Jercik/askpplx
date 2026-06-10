@@ -40,27 +40,27 @@
     "typecheck": "tsgo -b --noEmit"
   },
   "dependencies": {
-    "@ai-sdk/perplexity": "^3.0.31",
-    "@commander-js/extra-typings": "^14.0.0",
-    "ai": "^6.0.172",
-    "commander": "^14.0.3",
+    "@ai-sdk/perplexity": "^3.0.33",
+    "@commander-js/extra-typings": "^15.0.0",
+    "ai": "^6.0.198",
+    "commander": "^15.0.0",
     "conf": "^15.1.0",
-    "zod": "^4.4.1"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.6.1",
-    "@types/node": "^25.6.0",
+    "@types/node": "^25.9.2",
     "@typescript/native-preview": "beta",
-    "@vitest/coverage-v8": "^4.1.5",
+    "@vitest/coverage-v8": "^4.1.8",
     "fta-check": "^1.5.2",
     "fta-cli": "^3.0.0",
-    "knip": "^6.9.0",
-    "oxfmt": "^0.47.0",
-    "oxlint": "^1.62.0",
-    "oxlint-config-j4k": "^2.6.0",
-    "oxlint-tsgolint": "^0.22.1",
+    "knip": "^6.16.1",
+    "oxfmt": "^0.54.0",
+    "oxlint": "^1.69.0",
+    "oxlint-config-j4k": "^2.7.2",
+    "oxlint-tsgolint": "^0.23.0",
     "semantic-release": "^25.0.3",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.8"
   },
   "engines": {
     "node": ">=24.0.0"
