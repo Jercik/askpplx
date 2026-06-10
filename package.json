@@ -41,9 +41,9 @@
   },
   "dependencies": {
     "@ai-sdk/perplexity": "^3.0.33",
-    "@commander-js/extra-typings": "^14.0.0",
+    "@commander-js/extra-typings": "^15.0.0",
     "ai": "^6.0.198",
-    "commander": "^14.0.3",
+    "commander": "^15.0.0",
     "conf": "^15.1.0",
     "zod": "^4.4.3"
   },
