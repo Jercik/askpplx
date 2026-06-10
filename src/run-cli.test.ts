@@ -105,7 +105,7 @@ describe("formatResult", () => {
 
     const output = formatResult(result, { json: true, showThinking: false });
 
-    expect(JSON.parse(output)).toEqual({
+    expect(JSON.parse(output)).toStrictEqual({
       text: "Hello world",
       sources: [
         {
@@ -210,8 +210,14 @@ describe("runCli", () => {
 
       await runCli("test prompt", { model: "sonar" }, deps);
 
-      expect(deps.streamPerplexity).toHaveBeenCalled();
-      expect(deps.writeStream).toHaveBeenCalled();
+      expect(deps.streamPerplexity).toHaveBeenCalledWith({
+        apiKey: "test-api-key",
+        model: "sonar",
+        prompt: "test prompt",
+        system: DEFAULT_SYSTEM_PROMPT,
+        searchContextSize: undefined,
+      });
+      expect(deps.writeStream).toHaveBeenCalledWith("Streamed ");
     });
 
     it("writes streamed chunks to output", async () => {
