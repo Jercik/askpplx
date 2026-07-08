@@ -40,7 +40,7 @@
     "typecheck": "tsgo -b --noEmit"
   },
   "dependencies": {
-    "@ai-sdk/perplexity": "^3.0.33",
+    "@ai-sdk/perplexity": "^3.0.42",
     "@commander-js/extra-typings": "^15.0.0",
     "ai": "^6.0.198",
     "commander": "^15.0.0",
