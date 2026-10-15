@@ -7,13 +7,16 @@
     "jsx": "react-jsx",
     "outDir": "./dist",
     "rootDir": "./src",
-    "composite": true,
+    "composite": false,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "rewriteRelativeImportExtensions": true,
-    "target": "es2025"
+    "target": "es2025",
+    "noEmit": false,
+    "incremental": false
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "types/**/*.d.ts"],
-  "exclude": ["node_modules", "dist", "**/*.test.*", "**/*.spec.*"]
+  "exclude": ["node_modules", "dist", "**/*.test.*", "**/*.spec.*"],
+  "files": []
 }

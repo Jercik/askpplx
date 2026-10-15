@@ -204,7 +204,7 @@ function handleRequest(body: unknown): User {
 
 # Rule: Test What Matters
 
-Write tests where failure is expensive and the test can stay stable: business rules, data transformations, the functional core's public contracts, and a regression test for every bug you fix, shell code included, unless the compiler would reject the bug if it came back. Beyond those regression tests, leave the imperative shell — CLI entry points, HTTP handlers, database and file I/O — untested unless tests are requested; when they are, prefer a thin set of end-to-end flows over unit tests with mocks. Write fewer for pass-through forwarding, private helpers already covered through a public caller, call-count and call-order choreography, wholesale snapshots, and any test whose assertions mirror the implementation instead of the promised behavior.
+Write tests where failure is expensive and the test can stay stable: business rules, data transformations, the functional core's public contracts, and a regression test for every bug you fix, shell code included, unless the compiler would reject the bug if it came back. Beyond those regression tests, leave the imperative shell defined in “Separate the Functional Core from the Imperative Shell” untested unless tests are requested; when they are, prefer a thin set of end-to-end flows over unit tests with mocks. Write fewer for pass-through forwarding, private helpers already covered through a public caller, call-count and call-order choreography, wholesale snapshots, and any test whose assertions mirror the implementation instead of the promised behavior.
 
 ```ts
 // BAD: asserts internal choreography, not the promised behavior
@@ -362,7 +362,7 @@ Boolean mode flags are the same smell: two or more interdependent booleans model
 // BAD - creating and editing cannot both hold, and documentId means nothing outside editing
 type EditorState = { isCreating: boolean; isEditing: boolean; documentId?: string };
 
-// GOOD - three valid states, each carrying only its own data
+// GOOD
 type EditorState =
   | { mode: "closed" }
   | { mode: "creating" }
@@ -412,8 +412,8 @@ const Size = {
   md: "MEDIUM",
 } as const;
 
-type SizeKey = keyof typeof Size; // "xs" | "sm" | "md"
-type SizeValue = (typeof Size)[SizeKey]; // "EXTRA_SMALL" | "SMALL" | "MEDIUM"
+type SizeKey = keyof typeof Size;
+type SizeValue = (typeof Size)[SizeKey];
 ```
 
 Numeric enums are an extra trap: they produce reverse mappings that double the number of keys, so `Object.keys()` on a 4-member numeric enum returns 8 entries.
@@ -547,9 +547,11 @@ Restart the consumer dev server.
 
 When done, replace the `file:` path with a published range — the range `package.json` carried before the swap, or the newly released version (`pnpm add @scope/package@^1.2.4`). Don't commit a `file:` dependency.
 
-# Rule: Use Explicit `include`/`exclude` in tsconfig Files
+# Rule: Define Intentional `files`/`include`/`exclude` in tsconfig Files
 
-Use explicit `include`/`exclude` patterns in environment-specific configs. Exclude test files from production; include them in test configs. A solution-style root `tsconfig.json` (`files: []` plus project references) lists no inputs of its own — the patterns belong in the leaf configs.
+Define intentional `files`, `include` and `exclude` inputs for each checking and production context. Keep test-only ambient inputs outside production. An actual checking root owns its inputs and `noEmit: true`; a retained solution-style root (`files: []` plus project references) leaves inputs to its leaf configs. Shared bases own compiler defaults, not source selection. A validated native typed-lint solution root discovers its complete ordered checking contexts; it is not itself a checking program. Preserve that discovery graph and check the real programs explicitly.
+
+When a production config extends a broad checking root, clear inherited checking-only `files` with `files: []` or replace them with intentional production files. Preserve meaningful test and script contexts: matching file coverage alone does not prove their compiler environments redundant. `types: ["node"]` does not isolate source-level `declare global` or module augmentation.
 
 ```json
 // tsconfig.app.json (production)
