@@ -1,13 +1,17 @@
 {
-  "name": "askpplx",
+  "name": "@j4k-oss/askpplx",
   "version": "1.0.0",
   "description": "Minimal Unix-style CLI for querying Perplexity Sonar API.",
   "keywords": [],
+  "homepage": "https://code.j4k.dev/j4k-oss/askpplx#readme",
+  "bugs": {
+    "url": "https://code.j4k.dev/j4k-oss/askpplx/issues"
+  },
   "license": "MIT",
   "author": "Łukasz Jerciński",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Jercik/askpplx.git"
+    "url": "https://code.j4k.dev/j4k-oss/askpplx.git"
   },
   "bin": {
     "askpplx": "bin/askpplx"
@@ -20,7 +24,7 @@
   ],
   "type": "module",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://code.j4k.dev/api/packages/j4k-oss/npm/"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json && cp -r src/prompts dist/",
@@ -51,6 +55,7 @@
   "devDependencies": {
     "@j4k-oss/fta-check": "^1.5.10",
     "@j4k/oxlint-config": "2.14.2",
+    "@j4k/semantic-release-forgejo": "^1.2.4",
     "@total-typescript/ts-reset": "^0.6.1",
     "@types/node": "^24.0.0",
     "@vitest/coverage-v8": "^4.1.8",

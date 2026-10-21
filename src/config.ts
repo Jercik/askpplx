@@ -16,7 +16,7 @@ let configInstance: Conf<ConfigSchema> | undefined;
 
 function getConfig(): Conf<ConfigSchema> {
   configInstance ??= new Conf<ConfigSchema>({
-    projectName: packageJson.name,
+    projectName: "askpplx",
     projectVersion: packageJson.version,
     projectSuffix: "",
     schema,

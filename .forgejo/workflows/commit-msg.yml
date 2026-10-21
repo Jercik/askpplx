@@ -9,19 +9,24 @@ on:
     # fires on title and body edits, so a title change rechecks the squash subject.
     types: [opened, synchronize, reopened, edited]
 
-permissions:
-  contents: read
-  # Reading the current pull request needs more than contents: read.
-  pull-requests: read
-
 jobs:
   commitlint:
+    # When a trusted user edits or reopens a fork or AGit PR whose poster lacks
+    # Actions trust, Forgejo runs this base copy without approval. The job checks
+    # out that PR's head and executes its checker, so the PR's code would run
+    # on a root runner. Fork and
+    # AGit PRs therefore skip this check, and a skip is not a pass.
+    # Forgejo treats an AGit PR as a fork: its poster's own events run the head
+    # copy, where this guard could be deleted, only after approval.
+    # head.repo.fork is unreliable; AGit reuses repo identity without push access.
+    # Keep toJSON: a bare flow == 0 also admits a missing, null, '' or '0' flow (all coerce to 0).
+    if: github.event.pull_request.head.repo.full_name == github.repository && toJSON(github.event.pull_request.flow) == '0'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
         with:
-          # Fetches every branch, so the lint step finds the base without a fetch.
+          # Fetches every branch, so validation finds the base without a fetch.
           fetch-depth: 0
           # The validation step executes the PR's helper; do not persist its token.
           persist-credentials: false
@@ -34,7 +39,7 @@ jobs:
 
       - name: Read the current pull request
         # Reruns can replay stale metadata, so read the current pull request;
-        # the lint step still uses this run's event head.
+        # validation still uses this run's event head.
         # Only this step needs the job token.
         shell: bash
         env:
@@ -95,19 +100,26 @@ jobs:
           base_ref=$(cat "$pr_fields/ref")
 
           # Squash: the PR title becomes the target branch's subject.
-          { cat "$pr_fields/title"; printf '\n'; } | bash scripts/check-msg.sh --title
+          if { cat "$pr_fields/title"; printf '\n'; } | bash scripts/check-msg.sh --title; then
+            :
+          else
+            check_status=$?
+            printf '%s\n' 'commit-msg: PR title check failed' >&2
+            exit "$check_status"
+          fi
 
           # Forgejo allows branch names that start with "-", which --branch rejects.
           git check-ref-format "refs/heads/${base_ref}"
           from=$(git rev-parse "refs/remotes/origin/${base_ref}^{commit}")
 
           # Rebase: the PR's individual commits land on the target branch.
-          git log --format=%s "$from..$HEAD_SHA" > "$pr_fields/subjects"
+          git rev-list "$from..$HEAD_SHA" > "$pr_fields/commits"
           failed=0
-          while IFS= read -r subject; do
-            if ! printf '%s\n' "$subject" | bash scripts/check-msg.sh; then
-              printf 'commit-msg: rejected subject: %s\n' "$subject" >&2
+          while IFS= read -r commit; do
+            git show -s --format=%B "$commit" > "$pr_fields/message"
+            if ! bash scripts/check-msg.sh < "$pr_fields/message"; then
+              printf 'commit-msg: commit check failed: %s\n' "$commit" >&2
               failed=1
             fi
-          done < "$pr_fields/subjects"
+          done < "$pr_fields/commits"
           exit "$failed"

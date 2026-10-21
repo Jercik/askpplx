@@ -1,5 +1,7 @@
 # askpplx
 
+Source: https://code.j4k.dev/j4k-oss/askpplx. github.com/Jercik/askpplx is a read-only mirror; open issues and pull requests on the Forge.
+
 `askpplx` is a minimal Unix-style CLI for querying Perplexity Sonar.
 
 > **Perplexity AI** is an AI-powered search engine and answer engine that delivers concise, accurate responses to user queries by combining real-time web searches with advanced language models.
@@ -8,6 +10,28 @@
 - Output: plain text or JSON to stdout
 - No MCPs, no agents, no plugins, no TUI
 - Just a thin, script-friendly wrapper around the Perplexity API
+
+## Installation
+
+Each release is published under two names with the same files:
+
+- `askpplx` on npmjs.org, for `npx` and `npm exec`. All examples below use it.
+- `@j4k-oss/askpplx` on the `code.j4k.dev` registry, for pnpm projects that exempt the `@j4k-oss` scope from `minimumReleaseAge`. The registry reads anonymously.
+
+To use the `code.j4k.dev` copy, map the scope to its registry and exempt it in `pnpm-workspace.yaml`, then add the package:
+
+```yaml
+registries:
+  "@j4k-oss": https://code.j4k.dev/api/packages/j4k-oss/npm/
+minimumReleaseAgeExclude:
+  - "@j4k-oss/*"
+```
+
+```bash
+pnpm add -D @j4k-oss/askpplx
+```
+
+Both packages install the same `askpplx` command and read the same stored API key.
 
 ## Setup
 

@@ -31,7 +31,7 @@ Examples:
   askpplx "What changed in React 19?" --json | jq -r '.text'`;
 
 const program = new Command()
-  .name(packageJson.name)
+  .name("askpplx")
   .description(packageJson.description)
   .version(packageJson.version)
   .showHelpAfterError("(add --help for additional information)")
