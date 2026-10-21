@@ -9,9 +9,8 @@ import { formatFailure } from "./check-dts-report.ts";
 import { typecheckProjects } from "./check-dts-roots.ts";
 import { checkLeaf, describeConfig } from "./check-dts-tsc.ts";
 
-// Run after `typecheck`: it builds the workspace declarations the leaves import.
 // `tsc -p` on a solution-style root type-checks nothing, so every leaf of the
-// reference graph gets its own run. The graph starts at the projects `typecheck` builds.
+// reference graph gets its own run, starting at the projects `typecheck` checks.
 async function collectLeaves(): Promise<string[]> {
   const leaves: string[] = [];
   const seen = new Set<string>();

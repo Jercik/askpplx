@@ -26,7 +26,6 @@
     "build": "tsc -p tsconfig.build.json && cp -r src/prompts dist/",
     "check:dts": "node scripts/check-dts.ts",
     "clean": "rm -rf dist *.tsbuildinfo",
-    "commit-msg": "conventional-commit-msg",
     "format": "oxfmt --config .oxfmtrc.json .",
     "format:check": "oxfmt --check --config .oxfmtrc.json .",
     "fta": "fta-check",
@@ -50,13 +49,12 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@j4k-oss/fta-check": "^1.5.10",
     "@j4k/oxlint-config": "2.14.2",
     "@total-typescript/ts-reset": "^0.6.1",
     "@types/node": "^24.0.0",
     "@vitest/coverage-v8": "^4.1.8",
     "conventional-changelog-conventionalcommits": "^9.3.1",
-    "conventional-commit-msg": "catalog:",
-    "fta-check": "^1.5.8",
     "fta-cli": "^3.0.0",
     "knip": "^6.16.1",
     "oxfmt": "^0.57.0",
