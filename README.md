@@ -86,6 +86,6 @@ With `askpplx` installed globally, add this rule to your `CLAUDE.md` or `AGENTS.
 ```markdown
 # Rule: Use `askpplx` for Current Facts
 
-At the start of each session, run `askpplx --help` to verify the CLI is available and configured properly and check available options.
+At the start of each session, run `askpplx --help` to check CLI availability, available options, and whether an API key is present.
 When a task depends on current or uncertain external information, query `askpplx` instead of relying on memory.
 ```
