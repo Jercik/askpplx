@@ -13,12 +13,27 @@ Source: https://code.j4k.dev/j4k-oss/askpplx. github.com/Jercik/askpplx is a rea
 
 ## Installation
 
-Each release is published under two names with the same files:
+`askpplx` is published only as `@j4k-oss/askpplx` on the `code.j4k.dev` registry, which reads anonymously. The unscoped `askpplx` on npmjs.org is frozen at its last version and gets no updates.
 
-- `askpplx` on npmjs.org, for `npx` and `npm exec`. All examples below use it.
-- `@j4k-oss/askpplx` on the `code.j4k.dev` registry, for pnpm projects that exempt the `@j4k-oss` scope from `minimumReleaseAge`. The registry reads anonymously.
+The `@j4k-oss` scope also exists on npmjs.org, where its owner is not confirmed. Without a registry mapping, `npm` can fetch a package of that name from there, so map the scope to `code.j4k.dev`. Do it once in `~/.npmrc`:
 
-To use the `code.j4k.dev` copy, map the scope to its registry and exempt it in `pnpm-workspace.yaml`, then add the package:
+```ini
+@j4k-oss:registry=https://code.j4k.dev/api/packages/j4k-oss/npm/
+```
+
+The inline flag below is enough for a single `npx` run. Keep the `~/.npmrc` line for global installs: `npm update -g` and `npm outdated -g` read the registry from your configuration, and without the line they look the scoped name up on npmjs.org.
+
+If you installed the unscoped `askpplx` globally, run `npm uninstall -g askpplx` first. Both packages provide the `askpplx` command, so `npm install -g` would stop with `EEXIST`.
+
+```bash
+# global
+npm install -g --@j4k-oss:registry=https://code.j4k.dev/api/packages/j4k-oss/npm/ @j4k-oss/askpplx
+
+# one-off
+npx -y --@j4k-oss:registry=https://code.j4k.dev/api/packages/j4k-oss/npm/ @j4k-oss/askpplx@latest --help
+```
+
+In a pnpm project, map the scope to its registry and exempt it from `minimumReleaseAge` in `pnpm-workspace.yaml`, then add the package:
 
 ```yaml
 registries:
@@ -31,7 +46,7 @@ minimumReleaseAgeExclude:
 pnpm add -D @j4k-oss/askpplx
 ```
 
-Both packages install the same `askpplx` command and read the same stored API key.
+The examples below run the globally installed `askpplx`.
 
 ## Setup
 
@@ -42,7 +57,7 @@ Provide your Perplexity API key via environment variable or persistent storage:
 export PERPLEXITY_API_KEY="pplx-..."
 
 # Option 2: Store persistently
-npx -y askpplx config --set-api-key "pplx-..."
+askpplx config --set-api-key "pplx-..."
 ```
 
 ## Examples
@@ -66,11 +81,11 @@ askpplx "Latest TypeScript release notes" --json | jq -r '.sources[].url' | sort
 
 ## Agent Rule
 
-Add this rule to your `CLAUDE.md` or `AGENTS.md`:
+With `askpplx` installed globally, add this rule to your `CLAUDE.md` or `AGENTS.md`:
 
 ```markdown
 # Rule: Use `askpplx` for Current Facts
 
-At the start of each session, run `npx -y askpplx --help` to verify the CLI is available and configured properly and check available options.
+At the start of each session, run `askpplx --help` to verify the CLI is available and configured properly and check available options.
 When a task depends on current or uncertain external information, query `askpplx` instead of relying on memory.
 ```
