@@ -13,9 +13,9 @@ Source: https://code.j4k.dev/j4k-oss/askpplx. github.com/Jercik/askpplx is a rea
 
 ## Installation
 
-`askpplx` is published only as `@j4k-oss/askpplx` on the `code.j4k.dev` registry, which reads anonymously. The unscoped `askpplx` on npmjs.org is frozen at its last version and gets no updates.
+`askpplx` is published only as `@j4k-oss/askpplx` on the `code.j4k.dev` registry, which reads anonymously. The unscoped `askpplx` on npmjs.org is deprecated and gets no updates.
 
-The `@j4k-oss` scope also exists on npmjs.org, where its owner is not confirmed. Without a registry mapping, `npm` can fetch a package of that name from there, so map the scope to `code.j4k.dev`. Do it once in `~/.npmrc`:
+`@j4k-oss/askpplx` exists only on the `code.j4k.dev` registry. Without a registry mapping, `npm` looks on npmjs.org, finds nothing, and fails with a 404, so map the scope to `code.j4k.dev`. Do it once in `~/.npmrc`:
 
 ```ini
 @j4k-oss:registry=https://code.j4k.dev/api/packages/j4k-oss/npm/
