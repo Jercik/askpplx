@@ -191,8 +191,8 @@ importers:
         specifier: ^1.5.10
         version: 1.5.10(fta-cli@3.0.0)
       '@j4k/oxlint-config':
-        specifier: ^2.14.10
-        version: 2.14.10(oxlint-tsgolint@7.0.2006)(oxlint@1.92.0(oxlint-tsgolint@7.0.2006))
+        specifier: ^2.14.12
+        version: 2.14.12(oxlint-tsgolint@7.0.2006)(oxlint@1.92.0(oxlint-tsgolint@7.0.2006))
       '@j4k/semantic-release-forgejo':
         specifier: ^1.2.4
         version: 1.2.4(semantic-release@25.0.3(supports-color@7.2.0)(typescript@7.0.2))
@@ -645,8 +645,8 @@ packages:
     peerDependencies:
       fta-cli: ^3.0.0
 
-  '@j4k/oxlint-config@2.14.10':
-    resolution: {integrity: sha512-R/LZ/ZknHcRMKGtuAxyVQsrmErhMoXtWuUIPQgFInCYLI6YvWTL55278boh+v0Bf5TmXu4Avxess8OSSGckLug==, tarball: https://code.j4k.dev/api/packages/j4k/npm/%40j4k%2Foxlint-config/-/2.14.10/oxlint-config-2.14.10.tgz}
+  '@j4k/oxlint-config@2.14.12':
+    resolution: {integrity: sha512-zvBP9IbpOyuQWXtZfDhIz3Hsy8kqP2ltW1IV+KIwDGTHsQDIT92yzYsXKKdN84rKt48l8nDXKyltjscc31e+fg==, tarball: https://code.j4k.dev/api/packages/j4k/npm/%40j4k%2Foxlint-config/-/2.14.12/oxlint-config-2.14.12.tgz}
     peerDependencies:
       oxlint: '>=1.92.0'
       oxlint-tsgolint: '>=7.0.2006'
@@ -3278,7 +3278,7 @@ snapshots:
       commander: 14.0.3
       fta-cli: 3.0.0
 
-  '@j4k/oxlint-config@2.14.10(oxlint-tsgolint@7.0.2006)(oxlint@1.92.0(oxlint-tsgolint@7.0.2006))':
+  '@j4k/oxlint-config@2.14.12(oxlint-tsgolint@7.0.2006)(oxlint@1.92.0(oxlint-tsgolint@7.0.2006))':
     dependencies:
       oxlint: 1.92.0(oxlint-tsgolint@7.0.2006)
       oxlint-tsgolint: 7.0.2006
