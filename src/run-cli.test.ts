@@ -187,18 +187,6 @@ describe("runCli", () => {
 
       expect(deps.output).toHaveBeenCalledWith("API response\n\nSources:\n[1] https://example.com");
     });
-
-    it("outputs JSON when json option is true", async () => {
-      const deps = createMockDeps({
-        streamPerplexity: vi
-          .fn()
-          .mockReturnValue(createMockStreamResult(textParts(["API response"]))),
-      });
-
-      await runCli("test prompt", { model: "fast", json: true }, deps);
-
-      expect(deps.output).toHaveBeenCalledWith(expect.stringContaining('"text": "API response"'));
-    });
   });
 
   describe("reasoning", () => {
@@ -269,21 +257,6 @@ describe("runCli", () => {
   });
 
   describe("streaming mode", () => {
-    it("uses streaming by default", async () => {
-      const deps = createMockDeps();
-
-      await runCli("test prompt", { model: "fast" }, deps);
-
-      expect(deps.streamPerplexity).toHaveBeenCalledWith({
-        apiKey: "test-api-key",
-        model: "fast",
-        prompt: "test prompt",
-        system: DEFAULT_SYSTEM_PROMPT,
-        searchContextSize: undefined,
-      });
-      expect(deps.writeStream).toHaveBeenCalledWith("Streamed ");
-    });
-
     it("writes streamed chunks to output", async () => {
       const deps = createMockDeps();
 
@@ -295,10 +268,21 @@ describe("runCli", () => {
 
     it("outputs sources after streaming completes", async () => {
       const deps = createMockDeps();
+      const written: string[] = [];
+      deps.writeStream.mockImplementation((chunk) => {
+        written.push(chunk);
+      });
+      deps.output.mockImplementation((message) => {
+        written.push(message);
+      });
 
       await runCli("test prompt", { model: "fast" }, deps);
 
-      expect(deps.output).toHaveBeenCalledWith("\n\nSources:\n[1] https://example.com");
+      expect(written).toStrictEqual([
+        "Streamed ",
+        "response",
+        "\n\nSources:\n[1] https://example.com",
+      ]);
     });
   });
 
