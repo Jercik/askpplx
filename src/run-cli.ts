@@ -3,7 +3,6 @@ import { streamPerplexity } from "./ask-perplexity.js";
 import { getPerplexityApiKey } from "./config.js";
 import { loadSystemPrompt } from "./load-system-prompt.js";
 import { collectStreamToResult, formatSources, handleStreamingOutput } from "./stream-output.js";
-import { stripThinkContent } from "./strip-think-content.js";
 
 export interface CliOptions {
   model: string;
@@ -44,16 +43,13 @@ const defaultDependencies: CliDependencies = {
 
 interface FormatOptions {
   json: boolean;
-  showThinking: boolean;
 }
 
 export function formatResult(result: AskPerplexityResult, options: FormatOptions): string {
-  const text = options.showThinking ? result.text : stripThinkContent(result.text);
-
   if (options.json) {
     return JSON.stringify(
       {
-        text,
+        text: result.text,
         sources: result.sources,
         usage: result.usage,
         providerMetadata: result.providerMetadata,
@@ -63,7 +59,7 @@ export function formatResult(result: AskPerplexityResult, options: FormatOptions
     );
   }
 
-  return text.trim() + formatSources(result.sources);
+  return result.text.trim() + formatSources(result.sources);
 }
 
 export async function runCli(
@@ -98,13 +94,10 @@ export async function runCli(
   if (useStreaming) {
     await handleStreamingOutput(stream, { showThinking: options.showThinking ?? false }, deps);
   } else {
-    const result = await collectStreamToResult(stream);
+    const result = await collectStreamToResult(stream, {
+      showThinking: options.showThinking ?? false,
+    });
 
-    deps.output(
-      formatResult(result, {
-        json: options.json ?? false,
-        showThinking: options.showThinking ?? false,
-      }),
-    );
+    deps.output(formatResult(result, { json: options.json ?? false }));
   }
 }

@@ -2,7 +2,7 @@
 
 Source: https://code.j4k.dev/j4k-oss/askpplx. github.com/Jercik/askpplx is a read-only mirror; open issues and pull requests on the Forge.
 
-`askpplx` is a minimal Unix-style CLI for querying Perplexity Sonar.
+`askpplx` is a minimal Unix-style CLI for querying Perplexity.
 
 > **Perplexity AI** is an AI-powered search engine and answer engine that delivers concise, accurate responses to user queries by combining real-time web searches with advanced language models.
 
@@ -59,6 +59,14 @@ export PERPLEXITY_API_KEY="pplx-..."
 # Option 2: Store persistently
 askpplx config --set-api-key "pplx-..."
 ```
+
+## Models
+
+`askpplx` uses Perplexity's Agent API. `-m, --model` takes a preset (`fast`, `low`, `medium`, `high`, `xhigh`; default `medium`) or an Agent API model ID such as `perplexity/sonar`. Sonar model IDs such as `sonar-reasoning-pro` are no longer accepted.
+
+`--show-thinking` writes the model's reasoning to stdout wrapped in `<think>` and `</think>` before the answer, and includes it in the `--json` `text` field. Without it, reasoning is omitted. Models that return no reasoning print only the answer.
+
+If the API reports an error mid-stream, `askpplx` prints `Error: <message>` to stderr and exits with status 1.
 
 ## Examples
 

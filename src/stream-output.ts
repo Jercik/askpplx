@@ -24,46 +24,21 @@ export function formatSources(sources: AskPerplexityResult["sources"]): string {
   return `\n\nSources:\n${lines.join("\n")}`;
 }
 
-async function streamWithThinking(
+async function* answerChunks(
   stream: StreamPerplexityResult,
-  deps: Pick<StreamDependencies, "writeStream">,
-): Promise<void> {
-  for await (const chunk of stream.textStream) {
-    deps.writeStream(chunk);
-  }
-}
-
-async function streamWithoutThinking(
-  stream: StreamPerplexityResult,
-  deps: Pick<StreamDependencies, "writeStream">,
-): Promise<void> {
-  let buffer = "";
-  let insideThink = false;
-  let thinkEnded = false;
-
-  for await (const chunk of stream.textStream) {
-    if (thinkEnded) {
-      deps.writeStream(chunk);
-      continue;
-    }
-
-    buffer += chunk;
-
-    if (!insideThink && buffer.includes("<think>")) {
-      insideThink = true;
-    }
-
-    if (insideThink && buffer.includes("</think>")) {
-      thinkEnded = true;
-      const thinkEnd = buffer.lastIndexOf("</think>") + "</think>".length;
-      const afterThink = buffer.slice(thinkEnd);
-      if (afterThink) {
-        deps.writeStream(afterThink);
-      }
-      buffer = "";
-    } else if (!insideThink) {
-      deps.writeStream(buffer);
-      buffer = "";
+  showThinking: boolean,
+): AsyncGenerator<string> {
+  for await (const part of stream.stream) {
+    if (part.type === "text-delta") {
+      yield part.text;
+    } else if (part.type === "reasoning-start" && showThinking) {
+      yield "<think>";
+    } else if (part.type === "reasoning-delta" && showThinking) {
+      yield part.text;
+    } else if (part.type === "reasoning-end" && showThinking) {
+      yield "</think>";
+    } else if (part.type === "error") {
+      throw part.error instanceof Error ? part.error : new Error(String(part.error));
     }
   }
 }
@@ -73,9 +48,9 @@ export async function handleStreamingOutput(
   options: { showThinking: boolean },
   deps: StreamDependencies,
 ): Promise<void> {
-  await (options.showThinking
-    ? streamWithThinking(stream, deps)
-    : streamWithoutThinking(stream, deps));
+  for await (const chunk of answerChunks(stream, options.showThinking)) {
+    deps.writeStream(chunk);
+  }
 
   const sources = await stream.sources;
   const sourcesOutput = formatSources(sources);
@@ -88,17 +63,19 @@ export async function handleStreamingOutput(
 
 export async function collectStreamToResult(
   stream: StreamPerplexityResult,
+  options: { showThinking: boolean },
 ): Promise<AskPerplexityResult> {
   let text = "";
-  for await (const chunk of stream.textStream) {
+  for await (const chunk of answerChunks(stream, options.showThinking)) {
     text += chunk;
   }
 
-  const [sources, usage, providerMetadata] = await Promise.all([
+  const [sources, usage, finalStep] = await Promise.all([
     stream.sources,
     stream.usage,
-    stream.providerMetadata,
+    stream.finalStep,
   ]);
+  const { providerMetadata } = finalStep;
 
   return { text, sources, usage, providerMetadata };
 }

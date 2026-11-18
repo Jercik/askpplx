@@ -36,8 +36,12 @@ const program = new Command()
   .version(packageJson.version)
   .showHelpAfterError("(add --help for additional information)")
   .showSuggestionAfterError()
-  .argument("[prompt]", "The prompt to send to Perplexity Sonar")
-  .option("-m, --model <model>", "Model to use", "sonar-reasoning-pro")
+  .argument("[prompt]", "The prompt to send to Perplexity")
+  .option(
+    "-m, --model <model>",
+    "Perplexity Agent API preset (fast, low, medium, high, xhigh) or model ID",
+    "medium",
+  )
   .option("-s, --system <path>", "Path to custom system prompt file")
   .option("-S, --system-text <text>", "System prompt text (overrides -s)")
   .addOption(

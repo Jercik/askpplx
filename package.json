@@ -1,7 +1,7 @@
 {
   "name": "@j4k-oss/askpplx",
   "version": "1.0.0",
-  "description": "Minimal Unix-style CLI for querying Perplexity Sonar API.",
+  "description": "Minimal Unix-style CLI for querying Perplexity.",
   "keywords": [],
   "homepage": "https://code.j4k.dev/j4k-oss/askpplx#readme",
   "bugs": {
@@ -47,11 +47,11 @@
     "validate:packed-packages": "node scripts/validate-packed-packages.ts --packer npm"
   },
   "dependencies": {
-    "@ai-sdk/perplexity": "^3.0.42",
+    "@ai-sdk/perplexity": "^5.0.35",
     "@commander-js/extra-typings": "^15.0.0",
-    "ai": "^6.0.198",
+    "ai": "^7.0.173",
     "commander": "^15.0.0",
-    "conf": "^15.1.0",
+    "conf": "^16.0.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

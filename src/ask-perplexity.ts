@@ -1,4 +1,5 @@
 import { createPerplexity } from "@ai-sdk/perplexity";
+import type { PerplexityLanguageModelOptions } from "@ai-sdk/perplexity";
 import { streamText } from "ai";
 
 export type SearchContextSize = "low" | "medium" | "high";
@@ -25,14 +26,18 @@ export function streamPerplexity(options: AskPerplexityOptions): StreamPerplexit
 
   return streamText({
     model: perplexity(options.model),
-    system: options.system,
+    instructions: options.system,
     prompt: options.prompt,
+    onError: () => {},
     providerOptions: {
       perplexity: {
-        web_search_options: {
-          search_context_size: options.searchContextSize ?? "high",
-        },
-      },
+        tools: [
+          {
+            type: "web_search",
+            search_context_size: options.searchContextSize ?? "high",
+          },
+        ],
+      } satisfies PerplexityLanguageModelOptions,
     },
   });
 }

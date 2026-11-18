@@ -50,27 +50,42 @@ function createMockResult(overrides: Partial<AskPerplexityResult> = {}): AskPerp
   };
 }
 
-function createMockStreamResult(chunks: string[] = ["Streamed ", "response"]) {
-  const mockResult = createMockResult({ text: chunks.join("") });
+type MockPart =
+  | { type: "text-delta"; text: string }
+  | { type: "reasoning-start" }
+  | { type: "reasoning-delta"; text: string }
+  | { type: "reasoning-end" }
+  | { type: "error"; error: unknown };
+
+function textParts(chunks: string[]): MockPart[] {
+  return chunks.map((text) => ({ type: "text-delta", text }));
+}
+
+function createMockStreamResult(parts: MockPart[] = textParts(["Streamed ", "response"])) {
+  const mockResult = createMockResult();
   return {
-    textStream: {
+    stream: {
       *[Symbol.asyncIterator]() {
-        for (const chunk of chunks) {
-          yield chunk;
-        }
+        yield* parts;
       },
     },
     sources: Promise.resolve(mockResult.sources),
     usage: Promise.resolve(mockResult.usage),
-    providerMetadata: Promise.resolve(mockResult.providerMetadata),
+    finalStep: Promise.resolve({ providerMetadata: mockResult.providerMetadata }),
   };
 }
 
-type MockCliDependencies = CliDependencies & {
+type MockCliDependencies = Omit<CliDependencies, "exit" | "output" | "writeStream"> & {
   exit: Mock<(code: number) => void>;
+  output: Mock<(message: string) => void>;
+  writeStream: Mock<(chunk: string) => void>;
 };
 
-function createMockDeps(overrides: Partial<CliDependencies> = {}): MockCliDependencies {
+function createMockDeps(
+  overrides: Partial<
+    Pick<CliDependencies, "streamPerplexity" | "loadSystemPrompt" | "getApiKey">
+  > = {},
+): MockCliDependencies {
   return {
     streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult()),
     loadSystemPrompt: vi.fn().mockResolvedValue(DEFAULT_SYSTEM_PROMPT),
@@ -87,7 +102,7 @@ describe("formatResult", () => {
   it("returns text with sources when json is false", () => {
     const result = createMockResult({ text: "Hello world" });
 
-    const output = formatResult(result, { json: false, showThinking: false });
+    const output = formatResult(result, { json: false });
 
     expect(output).toBe("Hello world\n\nSources:\n[1] https://example.com");
   });
@@ -95,7 +110,7 @@ describe("formatResult", () => {
   it("returns text without sources section when no sources", () => {
     const result = createMockResult({ text: "Hello world", sources: [] });
 
-    const output = formatResult(result, { json: false, showThinking: false });
+    const output = formatResult(result, { json: false });
 
     expect(output).toBe("Hello world");
   });
@@ -103,7 +118,7 @@ describe("formatResult", () => {
   it("returns JSON string when json is true", () => {
     const result = createMockResult({ text: "Hello world" });
 
-    const output = formatResult(result, { json: true, showThinking: false });
+    const output = formatResult(result, { json: true });
 
     expect(JSON.parse(output)).toStrictEqual({
       text: "Hello world",
@@ -133,28 +148,6 @@ describe("formatResult", () => {
       },
     });
   });
-
-  it("strips think blocks by default", () => {
-    const result = createMockResult({
-      text: "<think>reasoning here</think>Hello world",
-    });
-
-    const output = formatResult(result, { json: false, showThinking: false });
-
-    expect(output).toBe("Hello world\n\nSources:\n[1] https://example.com");
-  });
-
-  it("preserves think blocks when showThinking is true", () => {
-    const result = createMockResult({
-      text: "<think>reasoning here</think>Hello world",
-    });
-
-    const output = formatResult(result, { json: false, showThinking: true });
-
-    expect(output).toBe(
-      "<think>reasoning here</think>Hello world\n\nSources:\n[1] https://example.com",
-    );
-  });
 });
 
 describe("runCli", () => {
@@ -162,11 +155,11 @@ describe("runCli", () => {
     it("calls streamPerplexity with correct parameters", async () => {
       const deps = createMockDeps();
 
-      await runCli("test prompt", { model: "sonar-pro", stream: false }, deps);
+      await runCli("test prompt", { model: "low", stream: false }, deps);
 
       expect(deps.streamPerplexity).toHaveBeenCalledWith({
         apiKey: "test-api-key",
-        model: "sonar-pro",
+        model: "low",
         prompt: "test prompt",
         system: DEFAULT_SYSTEM_PROMPT,
         searchContextSize: undefined,
@@ -176,7 +169,7 @@ describe("runCli", () => {
     it("passes searchContextSize when context option provided", async () => {
       const deps = createMockDeps();
 
-      await runCli("test prompt", { model: "sonar", context: "low", stream: false }, deps);
+      await runCli("test prompt", { model: "fast", context: "low", stream: false }, deps);
 
       expect(deps.streamPerplexity).toHaveBeenCalledWith(
         expect.objectContaining({ searchContextSize: "low" }),
@@ -185,22 +178,93 @@ describe("runCli", () => {
 
     it("outputs text with sources", async () => {
       const deps = createMockDeps({
-        streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult(["API response"])),
+        streamPerplexity: vi
+          .fn()
+          .mockReturnValue(createMockStreamResult(textParts(["API response"]))),
       });
 
-      await runCli("test prompt", { model: "sonar", stream: false }, deps);
+      await runCli("test prompt", { model: "fast", stream: false }, deps);
 
       expect(deps.output).toHaveBeenCalledWith("API response\n\nSources:\n[1] https://example.com");
     });
 
     it("outputs JSON when json option is true", async () => {
       const deps = createMockDeps({
-        streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult(["API response"])),
+        streamPerplexity: vi
+          .fn()
+          .mockReturnValue(createMockStreamResult(textParts(["API response"]))),
       });
 
-      await runCli("test prompt", { model: "sonar", json: true }, deps);
+      await runCli("test prompt", { model: "fast", json: true }, deps);
 
       expect(deps.output).toHaveBeenCalledWith(expect.stringContaining('"text": "API response"'));
+    });
+  });
+
+  describe("reasoning", () => {
+    const reasoningParts: MockPart[] = [
+      { type: "reasoning-start" },
+      { type: "reasoning-delta", text: "pondering" },
+      { type: "reasoning-end" },
+      ...textParts(["Answer"]),
+    ];
+
+    it("omits reasoning parts by default when streaming", async () => {
+      const deps = createMockDeps({
+        streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult(reasoningParts)),
+      });
+
+      await runCli("test prompt", { model: "fast" }, deps);
+
+      const written = deps.writeStream.mock.calls.map(([chunk]) => chunk).join("");
+      expect(written).toBe("Answer");
+    });
+
+    it("writes reasoning inside think tags with showThinking when streaming", async () => {
+      const deps = createMockDeps({
+        streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult(reasoningParts)),
+      });
+
+      await runCli("test prompt", { model: "fast", showThinking: true }, deps);
+
+      const written = deps.writeStream.mock.calls.map(([chunk]) => chunk).join("");
+      expect(written).toBe("<think>pondering</think>Answer");
+    });
+
+    it("omits reasoning from JSON text by default", async () => {
+      const deps = createMockDeps({
+        streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult(reasoningParts)),
+      });
+
+      await runCli("test prompt", { model: "fast", json: true }, deps);
+
+      const [output] = deps.output.mock.calls[0] ?? [];
+      expect(JSON.parse(output ?? "")).toMatchObject({ text: "Answer" });
+    });
+
+    it("includes think-tagged reasoning in JSON text with showThinking", async () => {
+      const deps = createMockDeps({
+        streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult(reasoningParts)),
+      });
+
+      await runCli("test prompt", { model: "fast", json: true, showThinking: true }, deps);
+
+      const [output] = deps.output.mock.calls[0] ?? [];
+      expect(JSON.parse(output ?? "")).toMatchObject({ text: "<think>pondering</think>Answer" });
+    });
+
+    it("rejects when the stream reports an error", async () => {
+      const deps = createMockDeps({
+        streamPerplexity: vi
+          .fn()
+          .mockReturnValue(
+            createMockStreamResult([{ type: "error", error: new Error("upstream failed") }]),
+          ),
+      });
+
+      await expect(runCli("test prompt", { model: "fast" }, deps)).rejects.toThrow(
+        "upstream failed",
+      );
     });
   });
 
@@ -208,11 +272,11 @@ describe("runCli", () => {
     it("uses streaming by default", async () => {
       const deps = createMockDeps();
 
-      await runCli("test prompt", { model: "sonar" }, deps);
+      await runCli("test prompt", { model: "fast" }, deps);
 
       expect(deps.streamPerplexity).toHaveBeenCalledWith({
         apiKey: "test-api-key",
-        model: "sonar",
+        model: "fast",
         prompt: "test prompt",
         system: DEFAULT_SYSTEM_PROMPT,
         searchContextSize: undefined,
@@ -223,7 +287,7 @@ describe("runCli", () => {
     it("writes streamed chunks to output", async () => {
       const deps = createMockDeps();
 
-      await runCli("test prompt", { model: "sonar" }, deps);
+      await runCli("test prompt", { model: "fast" }, deps);
 
       expect(deps.writeStream).toHaveBeenCalledWith("Streamed ");
       expect(deps.writeStream).toHaveBeenCalledWith("response");
@@ -232,7 +296,7 @@ describe("runCli", () => {
     it("outputs sources after streaming completes", async () => {
       const deps = createMockDeps();
 
-      await runCli("test prompt", { model: "sonar" }, deps);
+      await runCli("test prompt", { model: "fast" }, deps);
 
       expect(deps.output).toHaveBeenCalledWith("\n\nSources:\n[1] https://example.com");
     });
@@ -242,7 +306,7 @@ describe("runCli", () => {
     it("loads default system prompt when no custom path provided", async () => {
       const deps = createMockDeps();
 
-      await runCli("test prompt", { model: "sonar", stream: false }, deps);
+      await runCli("test prompt", { model: "fast", stream: false }, deps);
 
       expect(deps.loadSystemPrompt).toHaveBeenCalledWith(undefined);
     });
@@ -255,7 +319,7 @@ describe("runCli", () => {
 
       await runCli(
         "test prompt",
-        { model: "sonar", system: "/path/to/prompt.md", stream: false },
+        { model: "fast", system: "/path/to/prompt.md", stream: false },
         deps,
       );
 
@@ -270,7 +334,7 @@ describe("runCli", () => {
         getApiKey: vi.fn(),
       });
 
-      await runCli("test prompt", { model: "sonar" }, deps);
+      await runCli("test prompt", { model: "fast" }, deps);
 
       expect(deps.errorOutput).toHaveBeenCalledWith(
         "Error: Perplexity API key is required\n" +
