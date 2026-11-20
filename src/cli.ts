@@ -7,6 +7,7 @@ import {
   clearPerplexityApiKey,
   getConfigPath,
   getPerplexityApiKey,
+  getStoredPerplexityApiKey,
   maskApiKey,
   setPerplexityApiKey,
 } from "./config.js";
@@ -114,9 +115,8 @@ const configCommand = program
           setPerplexityApiKey(options.setApiKey);
           console.error("API key stored successfully.");
         } else if (options.showApiKey) {
-          const key = getPerplexityApiKey();
-          const masked = maskApiKey(key);
-          console.log(masked ? `API key: ${masked}` : "No API key configured.");
+          const masked = maskApiKey(getStoredPerplexityApiKey());
+          console.log(masked ? `API key: ${masked}` : "No API key stored.");
         } else if (options.clearApiKey) {
           clearPerplexityApiKey();
           console.error("API key cleared.");

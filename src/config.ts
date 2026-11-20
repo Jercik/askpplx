@@ -30,7 +30,11 @@ function getConfig(): Conf<ConfigSchema> {
  * Note: An empty PERPLEXITY_API_KEY="" explicitly disables stored config.
  */
 export function getPerplexityApiKey(): string | undefined {
-  return process.env.PERPLEXITY_API_KEY ?? getConfig().get("perplexityApiKey");
+  return process.env.PERPLEXITY_API_KEY ?? getStoredPerplexityApiKey();
+}
+
+export function getStoredPerplexityApiKey(): string | undefined {
+  return getConfig().get("perplexityApiKey");
 }
 
 /** Store API key in persistent config. */
