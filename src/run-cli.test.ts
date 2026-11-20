@@ -76,10 +76,8 @@ function createMockStreamResult(parts: MockPart[] = textParts(["Streamed ", "res
   };
 }
 
-type MockCliDependencies = Omit<CliDependencies, "exit" | "output" | "writeStream"> & {
-  exit: Mock<(code: number) => void>;
-  output: Mock<(message: string) => void>;
-  writeStream: Mock<(chunk: string) => void>;
+type MockCliDependencies = Omit<CliDependencies, "write"> & {
+  write: Mock<(text: string) => void>;
 };
 
 function createMockDeps(
@@ -91,11 +89,8 @@ function createMockDeps(
     streamPerplexity: vi.fn().mockReturnValue(createMockStreamResult()),
     loadSystemPrompt: vi.fn().mockResolvedValue(DEFAULT_SYSTEM_PROMPT),
     getApiKey: vi.fn().mockReturnValue("test-api-key"),
-    output: vi.fn<(message: string) => void>(),
-    writeStream: vi.fn<(chunk: string) => void>(),
-    errorOutput: vi.fn<(message: string) => void>(),
+    write: vi.fn<(text: string) => void>(),
     ...overrides,
-    exit: vi.fn<(code: number) => void>(),
   };
 }
 
@@ -225,7 +220,9 @@ describe("runCli", () => {
 
       await runCli("test prompt", { model: "fast", stream: false }, deps);
 
-      expect(deps.output).toHaveBeenCalledWith("API response\n\nSources:\n[1] https://example.com");
+      expect(deps.write).toHaveBeenCalledWith(
+        "API response\n\nSources:\n[1] https://example.com\n",
+      );
     });
   });
 
@@ -244,8 +241,8 @@ describe("runCli", () => {
 
       await runCli("test prompt", { model: "fast" }, deps);
 
-      const written = deps.writeStream.mock.calls.map(([chunk]) => chunk).join("");
-      expect(written).toBe("Answer");
+      const written = deps.write.mock.calls.map(([text]) => text).join("");
+      expect(written).toBe("Answer\n\nSources:\n[1] https://example.com\n");
     });
 
     it("writes reasoning inside think tags with showThinking when streaming", async () => {
@@ -255,8 +252,8 @@ describe("runCli", () => {
 
       await runCli("test prompt", { model: "fast", showThinking: true }, deps);
 
-      const written = deps.writeStream.mock.calls.map(([chunk]) => chunk).join("");
-      expect(written).toBe("<think>pondering</think>Answer");
+      const written = deps.write.mock.calls.map(([text]) => text).join("");
+      expect(written).toBe("<think>pondering</think>Answer\n\nSources:\n[1] https://example.com\n");
     });
 
     it("omits reasoning from JSON text by default", async () => {
@@ -266,7 +263,7 @@ describe("runCli", () => {
 
       await runCli("test prompt", { model: "fast", json: true }, deps);
 
-      const [output] = deps.output.mock.calls[0] ?? [];
+      const [output] = deps.write.mock.calls[0] ?? [];
       expect(JSON.parse(output ?? "")).toMatchObject({ text: "Answer" });
     });
 
@@ -277,7 +274,7 @@ describe("runCli", () => {
 
       await runCli("test prompt", { model: "fast", json: true, showThinking: true }, deps);
 
-      const [output] = deps.output.mock.calls[0] ?? [];
+      const [output] = deps.write.mock.calls[0] ?? [];
       expect(JSON.parse(output ?? "")).toMatchObject({ text: "<think>pondering</think>Answer" });
     });
 
@@ -302,26 +299,19 @@ describe("runCli", () => {
 
       await runCli("test prompt", { model: "fast" }, deps);
 
-      expect(deps.writeStream).toHaveBeenCalledWith("Streamed ");
-      expect(deps.writeStream).toHaveBeenCalledWith("response");
+      expect(deps.write).toHaveBeenCalledWith("Streamed ");
+      expect(deps.write).toHaveBeenCalledWith("response");
     });
 
     it("outputs sources after streaming completes", async () => {
       const deps = createMockDeps();
-      const written: string[] = [];
-      deps.writeStream.mockImplementation((chunk) => {
-        written.push(chunk);
-      });
-      deps.output.mockImplementation((message) => {
-        written.push(message);
-      });
 
       await runCli("test prompt", { model: "fast" }, deps);
 
-      expect(written).toStrictEqual([
-        "Streamed ",
-        "response",
-        "\n\nSources:\n[1] https://example.com",
+      expect(deps.write.mock.calls).toStrictEqual([
+        ["Streamed "],
+        ["response"],
+        ["\n\nSources:\n[1] https://example.com\n"],
       ]);
     });
   });
@@ -353,19 +343,16 @@ describe("runCli", () => {
       );
     });
 
-    it("exits with error when API key is missing", async () => {
+    it("rejects when the API key is missing", async () => {
       const deps = createMockDeps({
         getApiKey: vi.fn(),
       });
 
-      await runCli("test prompt", { model: "fast" }, deps);
-
-      expect(deps.errorOutput).toHaveBeenCalledWith(
-        "Error: Perplexity API key is required\n" +
+      await expect(runCli("test prompt", { model: "fast" }, deps)).rejects.toThrow(
+        "Perplexity API key is required\n" +
           "Set it with: export PERPLEXITY_API_KEY='your-api-key'\n" +
           "Or store it: askpplx config --set-api-key 'your-api-key'",
       );
-      expect(deps.exit).toHaveBeenCalledWith(1);
     });
   });
 });

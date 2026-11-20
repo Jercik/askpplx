@@ -1,8 +1,7 @@
 import type { AskPerplexityResult, StreamPerplexityResult } from "./ask-perplexity.js";
 
 interface StreamDependencies {
-  writeStream: (chunk: string) => void;
-  output: (message: string) => void;
+  write: (text: string) => void;
 }
 
 export function formatSources(sources: AskPerplexityResult["sources"]): string {
@@ -59,16 +58,10 @@ export async function handleStreamingOutput(
   deps: StreamDependencies,
 ): Promise<void> {
   for await (const chunk of answerChunks(stream, options.showThinking)) {
-    deps.writeStream(chunk);
+    deps.write(chunk);
   }
 
-  const sources = await stream.sources;
-  const sourcesOutput = formatSources(sources);
-  if (sourcesOutput) {
-    deps.output(sourcesOutput);
-  } else {
-    deps.writeStream("\n");
-  }
+  deps.write(`${formatSources(await stream.sources)}\n`);
 }
 
 export async function collectStreamToResult(
