@@ -11,7 +11,7 @@ export function formatSources(sources: AskPerplexityResult["sources"]): string {
   }
 
   // Answers cite search results as [web:<resultId>]. Fetched pages and annotations carry no
-  // result id, so they are listed unnumbered after the numbered ones.
+  // result id.
   const numbered: string[] = [];
   const unnumbered: string[] = [];
   for (const source of sources) {
