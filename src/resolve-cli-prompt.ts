@@ -1,8 +1,8 @@
-export function resolveCliPrompt(
+export async function resolveCliPrompt(
   promptArgument: string | undefined,
-  stdinText?: string,
-): string | undefined {
-  const candidate = (promptArgument ?? stdinText)?.trimEnd();
+  readStdin: () => Promise<string | undefined>,
+): Promise<string | undefined> {
+  const candidate = (promptArgument ?? (await readStdin()))?.trimEnd();
   if (candidate === undefined) {
     return undefined;
   }

@@ -61,13 +61,13 @@ const program = new Command()
   .addHelpText("after", usageExamples)
   .action(async (prompt, options) => {
     try {
-      let stdinText: string | undefined;
-      if (!prompt && !process.stdin.isTTY) {
+      const effectivePrompt = await resolveCliPrompt(prompt, async () => {
+        if (process.stdin.isTTY) {
+          return undefined;
+        }
         process.stdin.setEncoding("utf8");
-        stdinText = await collectStdinText(process.stdin as AsyncIterable<string>);
-      }
-
-      const effectivePrompt = resolveCliPrompt(prompt, stdinText);
+        return collectStdinText(process.stdin as AsyncIterable<string>);
+      });
       if (!effectivePrompt) {
         program.error(
           "Missing prompt.\n" +
