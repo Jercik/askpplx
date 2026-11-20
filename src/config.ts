@@ -19,6 +19,7 @@ function getConfig(): Conf<ConfigSchema> {
     projectName: "askpplx",
     projectVersion: packageJson.version,
     projectSuffix: "",
+    configFileMode: 0o600,
     schema,
   });
   return configInstance;
