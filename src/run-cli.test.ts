@@ -294,16 +294,7 @@ describe("runCli", () => {
   });
 
   describe("streaming mode", () => {
-    it("writes streamed chunks to output", async () => {
-      const deps = createMockDeps();
-
-      await runCli("test prompt", { model: "fast" }, deps);
-
-      expect(deps.write).toHaveBeenCalledWith("Streamed ");
-      expect(deps.write).toHaveBeenCalledWith("response");
-    });
-
-    it("outputs sources after streaming completes", async () => {
+    it("writes streamed chunks in order, then the sources section", async () => {
       const deps = createMockDeps();
 
       await runCli("test prompt", { model: "fast" }, deps);
