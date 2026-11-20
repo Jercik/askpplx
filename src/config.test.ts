@@ -3,7 +3,6 @@ import {
   clearPerplexityApiKey,
   getConfigPath,
   getPerplexityApiKey,
-  getStoredPerplexityApiKey,
   maskApiKey,
   setPerplexityApiKey,
 } from "./config.js";
@@ -84,17 +83,6 @@ describe("config", () => {
         getMock.mockReturnValue("stored-key");
 
         expect(getPerplexityApiKey()).toBe("");
-      });
-    });
-  });
-
-  describe("getStoredPerplexityApiKey", () => {
-    it("returns the stored key even when the env var is set", () => {
-      withCleanConfigState(() => {
-        process.env.PERPLEXITY_API_KEY = "env-key";
-        getMock.mockReturnValue("stored-key");
-
-        expect(getStoredPerplexityApiKey()).toBe("stored-key");
       });
     });
   });
