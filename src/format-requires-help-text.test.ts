@@ -11,9 +11,13 @@ describe("formatRequiresHelpText", () => {
     );
   });
 
-  it("shows last 4 characters when key is configured", () => {
+  it("shows the configured key masked", () => {
     expect(formatRequiresHelpText("pplx-abcdefgh1234")).toBe(
-      "Requires: PERPLEXITY_API_KEY (configured: last4=1234)",
+      "Requires: PERPLEXITY_API_KEY (configured: pplx...1234)",
     );
+  });
+
+  it("reveals no part of a key too short to mask", () => {
+    expect(formatRequiresHelpText("abcd")).toBe("Requires: PERPLEXITY_API_KEY (configured: ****)");
   });
 });

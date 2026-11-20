@@ -1,9 +1,8 @@
-function getApiKeySuffix(apiKey: string): string {
-  return apiKey.slice(-4);
-}
+import { maskApiKey } from "./config.js";
 
 export function formatRequiresHelpText(apiKey?: string): string {
-  if (!apiKey) {
+  const maskedApiKey = maskApiKey(apiKey);
+  if (!maskedApiKey) {
     return (
       "Requires:\n" +
       "  - PERPLEXITY_API_KEY - MISSING! Set PERPLEXITY_API_KEY=<token> " +
@@ -11,5 +10,5 @@ export function formatRequiresHelpText(apiKey?: string): string {
     );
   }
 
-  return `Requires: PERPLEXITY_API_KEY (configured: last4=${getApiKeySuffix(apiKey)})`;
+  return `Requires: PERPLEXITY_API_KEY (configured: ${maskedApiKey})`;
 }
