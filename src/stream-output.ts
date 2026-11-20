@@ -10,13 +10,23 @@ export function formatSources(sources: AskPerplexityResult["sources"]): string {
     return "";
   }
 
-  const lines: string[] = [];
-  for (const [index, source] of sources.entries()) {
-    if (source.sourceType === "url") {
-      lines.push(`[${String(index + 1)}] ${source.url}`);
+  // Answers cite search results as [web:<resultId>]. Fetched pages and annotations carry no
+  // result id, so they are listed unnumbered after the numbered ones.
+  const numbered: string[] = [];
+  const unnumbered: string[] = [];
+  for (const source of sources) {
+    if (source.sourceType !== "url") {
+      continue;
+    }
+    const resultId = source.providerMetadata?.perplexity?.resultId;
+    if (typeof resultId === "number") {
+      numbered.push(`[${String(resultId)}] ${source.url}`);
+    } else {
+      unnumbered.push(`- ${source.url}`);
     }
   }
 
+  const lines = [...numbered, ...unnumbered];
   if (lines.length === 0) {
     return "";
   }

@@ -19,8 +19,9 @@ function createMockResult(overrides: Partial<AskPerplexityResult> = {}): AskPerp
       {
         type: "source",
         sourceType: "url",
-        id: "test-id",
+        id: "1",
         url: "https://example.com",
+        providerMetadata: { perplexity: { resultId: 1 } },
       },
     ],
     usage: {
@@ -107,6 +108,44 @@ describe("formatResult", () => {
     expect(output).toBe("Hello world\n\nSources:\n[1] https://example.com");
   });
 
+  it("numbers each source by the search result id the answer cites and lists the rest unnumbered", () => {
+    const result = createMockResult({
+      text: "Bun is fast [web:3], Deno is secure [web:7].",
+      sources: [
+        {
+          type: "source",
+          sourceType: "url",
+          id: "3",
+          url: "https://bun.example/blog",
+          providerMetadata: { perplexity: { resultId: 3 } },
+        },
+        {
+          type: "source",
+          sourceType: "url",
+          id: "fetched-page",
+          url: "https://fetched.example/page",
+          providerMetadata: { perplexity: { snippet: "fetched text" } },
+        },
+        {
+          type: "source",
+          sourceType: "url",
+          id: "7",
+          url: "https://deno.example/security",
+          providerMetadata: { perplexity: { resultId: 7 } },
+        },
+      ],
+    });
+
+    const output = formatResult(result, { json: false });
+
+    expect(output).toBe(
+      "Bun is fast [web:3], Deno is secure [web:7].\n\nSources:\n" +
+        "[3] https://bun.example/blog\n" +
+        "[7] https://deno.example/security\n" +
+        "- https://fetched.example/page",
+    );
+  });
+
   it("returns text without sources section when no sources", () => {
     const result = createMockResult({ text: "Hello world", sources: [] });
 
@@ -126,8 +165,9 @@ describe("formatResult", () => {
         {
           type: "source",
           sourceType: "url",
-          id: "test-id",
+          id: "1",
           url: "https://example.com",
+          providerMetadata: { perplexity: { resultId: 1 } },
         },
       ],
       usage: {
