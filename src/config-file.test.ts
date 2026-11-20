@@ -51,3 +51,14 @@ test("reads the stored API key even when PERPLEXITY_API_KEY is set", () => {
 
   expect(storedKey).toBe("pplx-stored-key-0123456789");
 });
+
+test("clearing the API key leaves no stored key", () => {
+  const storedKey = runWithFreshHome(`
+    const { setPerplexityApiKey, clearPerplexityApiKey, getStoredPerplexityApiKey } = await import(${JSON.stringify(configModuleUrl)});
+    setPerplexityApiKey("pplx-stored-key-0123456789");
+    clearPerplexityApiKey();
+    process.stdout.write(String(getStoredPerplexityApiKey()));
+  `);
+
+  expect(storedKey).toBe("undefined");
+});

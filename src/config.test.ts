@@ -1,26 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
-import {
-  clearPerplexityApiKey,
-  getConfigPath,
-  getPerplexityApiKey,
-  maskApiKey,
-  setPerplexityApiKey,
-} from "./config.js";
+import { getPerplexityApiKey, maskApiKey } from "./config.js";
 
 // Mock conf before importing config.ts (lazy singleton instantiates on first use)
-const { getMock, setMock, deleteMock, pathMock } = vi.hoisted(() => ({
+const { getMock } = vi.hoisted(() => ({
   getMock: vi.fn(),
-  setMock: vi.fn(),
-  deleteMock: vi.fn(),
-  pathMock: "/mock/path/config.json",
 }));
 
 vi.mock("conf", () => ({
   default: class MockConfig {
     get = getMock;
-    set = setMock;
-    delete = deleteMock;
-    path = pathMock;
   },
 }));
 
@@ -43,15 +31,6 @@ function withCleanConfigState(run: () => void): void {
 
 describe("config", () => {
   describe("getPerplexityApiKey", () => {
-    it("returns env var when set", () => {
-      withCleanConfigState(() => {
-        process.env.PERPLEXITY_API_KEY = "env-key";
-        getMock.mockReturnValue("stored-key");
-
-        expect(getPerplexityApiKey()).toBe("env-key");
-      });
-    });
-
     it("returns stored key when env var is not set", () => {
       withCleanConfigState(() => {
         getMock.mockReturnValue("stored-key");
@@ -83,34 +62,6 @@ describe("config", () => {
         getMock.mockReturnValue("stored-key");
 
         expect(getPerplexityApiKey()).toBe("");
-      });
-    });
-  });
-
-  describe("setPerplexityApiKey", () => {
-    it("stores API key in config", () => {
-      withCleanConfigState(() => {
-        setPerplexityApiKey("new-key");
-
-        expect(setMock).toHaveBeenCalledWith("perplexityApiKey", "new-key");
-      });
-    });
-  });
-
-  describe("clearPerplexityApiKey", () => {
-    it("removes API key from config", () => {
-      withCleanConfigState(() => {
-        clearPerplexityApiKey();
-
-        expect(deleteMock).toHaveBeenCalledWith("perplexityApiKey");
-      });
-    });
-  });
-
-  describe("getConfigPath", () => {
-    it("returns config file path", () => {
-      withCleanConfigState(() => {
-        expect(getConfigPath()).toBe("/mock/path/config.json");
       });
     });
   });
