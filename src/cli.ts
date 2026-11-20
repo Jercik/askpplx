@@ -14,7 +14,10 @@ import { formatRequiresHelpText } from "./format-requires-help-text.js";
 import type { CliOptions } from "./run-cli.js";
 import { runCli } from "./run-cli.js";
 import { collectStdinText } from "./collect-stdin-text.js";
+import { exitOnClosedStdout } from "./exit-on-closed-stdout.js";
 import { resolveCliPrompt } from "./resolve-cli-prompt.js";
+
+exitOnClosedStdout();
 
 const usageExamples = `
 Examples:
